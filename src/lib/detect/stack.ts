@@ -3,7 +3,6 @@ import type {
   FileRecord,
   LanguageBreakdown,
   LanguageId,
-  SourceFile,
   StackFinding,
   StackProfile,
 } from '@/lib/core/types';

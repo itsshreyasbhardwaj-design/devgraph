@@ -298,10 +298,23 @@ export async function analyzeRepository(options: AnalyzeOptions): Promise<Analys
     severity: files.length >= 6 ? 'high' : files.length >= 3 ? 'medium' : 'low',
   }));
 
-  // ---- 6. Extractors ----------------------------------------------------
+  // ---- 6. Stack detection ----------------------------------------------
+  // Runs before extraction so ambiguous route syntax (`@app.get` is both
+  // FastAPI and Flask) can be attributed to the framework actually present.
+  const stack = detectStack({ files: fileRecords, sources: sourceText, manifests });
+  const detectedFrameworks = new Set(
+    stack.findings.filter((finding) => finding.category === 'framework').map((finding) => finding.name),
+  );
+
+  // ---- 7. Extractors ----------------------------------------------------
   report('extracting', 'Extracting routes, schema and configuration', 0.65);
 
-  const apis = extractRoutes({ sources: candidates, parsed });
+  const apis = extractRoutes({
+    sources: candidates,
+    parsed,
+    masked: maskedCode,
+    frameworks: detectedFrameworks,
+  });
   const schema = extractSchema(candidates.filter((f) => isSchemaCandidate(f.path)));
   const env = extractEnv({ sources: candidates, parsed });
   warnings.push(...envWarnings(env));
@@ -315,7 +328,7 @@ export async function analyzeRepository(options: AnalyzeOptions): Promise<Analys
     for (const record of fileRecords) record.coverage = byPath.get(record.path);
   }
 
-  // ---- 7. Metrics -------------------------------------------------------
+  // ---- 8. Metrics -------------------------------------------------------
   report('metrics', 'Computing metrics', 0.75);
 
   const duplication = detectDuplication(
@@ -346,14 +359,12 @@ export async function analyzeRepository(options: AnalyzeOptions): Promise<Analys
     markers,
   });
 
-  // ---- 8. Stack + entry points -----------------------------------------
-  const stack = detectStack({ files: fileRecords, sources: sourceText, manifests });
-
+  // ---- 9. Entry points --------------------------------------------------
   const entryPoints: EntryPoint[] = detectEntryPoints(fileRecords, manifests, fanIn);
   const entrySet = new Set(entryPoints.map((e) => e.path));
   for (const record of fileRecords) record.isEntryPoint = entrySet.has(record.path);
 
-  // ---- 9. Graphs --------------------------------------------------------
+  // ---- 10. Graphs -------------------------------------------------------
   report('graphing', 'Building interactive graphs', 0.85);
 
   const graphInput: GraphInput = {
@@ -369,7 +380,7 @@ export async function analyzeRepository(options: AnalyzeOptions): Promise<Analys
   };
   const graphs = buildAllGraphs(graphInput);
 
-  // ---- 10. Search + insights -------------------------------------------
+  // ---- 11. Search + insights --------------------------------------------
   report('insights', 'Generating architecture insights', 0.93);
 
   const searchIndexEntries = buildSearchIndex({

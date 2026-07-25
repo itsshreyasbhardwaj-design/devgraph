@@ -249,9 +249,9 @@ export class ImportResolver {
   // -- Go ------------------------------------------------------------------
 
   private resolveGo(specifier: string): ResolvedImport {
-    const module = this.manifests.goModule;
-    if (module && (specifier === module || specifier.startsWith(`${module}/`))) {
-      const dir = normalizePath(specifier.slice(module.length).replace(/^\//, ''));
+    const modulePath = this.manifests.goModule;
+    if (modulePath && (specifier === modulePath || specifier.startsWith(`${modulePath}/`))) {
+      const dir = normalizePath(specifier.slice(modulePath.length).replace(/^\//, ''));
       const candidates = this.byGoPackageDir.get(dir) ?? [];
       const target = candidates.find((p) => p.endsWith('.go') && !p.endsWith('_test.go'));
       if (target) return { specifier, target, external: false };
@@ -275,7 +275,7 @@ export class ImportResolver {
 
     if (root === 'crate' || root === 'self' || root === 'super') {
       let baseDir = root === 'crate' ? rustCrateRoot(fromFile) : dirname(fromFile);
-      let rest = segments.slice(1);
+      const rest = segments.slice(1);
       if (root === 'super') baseDir = dirname(baseDir);
       // Trailing segment may be a type rather than a module.
       for (let take = rest.length; take >= 0; take -= 1) {

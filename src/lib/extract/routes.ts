@@ -292,7 +292,20 @@ function detectConvention(file: SourceFile, parsed: ParsedFile | undefined): Con
 // Extraction
 // ---------------------------------------------------------------------------
 
-/** Strip whole-line comments so commented-out routes are not reported. */
+/**
+ * Was the character at `index` blanked by the scanner?
+ *
+ * The mask replaces comment bodies and string contents with spaces while
+ * preserving every offset, so comparing the two strings at a single index tells
+ * us whether a match started inside a comment or a docstring. This is what
+ * stops Flask's own documentation examples from being reported as routes.
+ */
+function isMaskedAt(masked: string | undefined, original: string, index: number): boolean {
+  if (!masked) return false;
+  return masked[index] !== original[index];
+}
+
+/** Fallback for files with no mask: drop whole-line comments. */
 function stripCommentLines(content: string): string {
   return content
     .split('\n')
@@ -304,7 +317,7 @@ function stripCommentLines(content: string): string {
         trimmed.startsWith('*') ||
         trimmed.startsWith('/*')
       ) {
-        return '';
+        return ' '.repeat(line.length);
       }
       return line;
     })
@@ -314,6 +327,10 @@ function stripCommentLines(content: string): string {
 export interface RouteExtractionInput {
   sources: SourceFile[];
   parsed: Map<string, ParsedFile>;
+  /** Scanner output per file, used to reject matches inside comments. */
+  masked?: Map<string, string>;
+  /** Detected framework names, used to disambiguate shared syntax. */
+  frameworks?: Set<string>;
 }
 
 export function extractRoutes(input: RouteExtractionInput): ApiRoute[] {
@@ -349,7 +366,13 @@ export function extractRoutes(input: RouteExtractionInput): ApiRoute[] {
     }
 
     if (!language) continue;
-    const text = stripCommentLines(file.content);
+
+    // Route paths live inside string literals, which the mask blanks, so the
+    // patterns run against the original text and the mask is consulted only to
+    // reject matches that started inside a comment or docstring.
+    const masked = input.masked?.get(file.path);
+    const text = file.content;
+    const guard = masked ? masked : stripCommentLines(file.content);
 
     for (const rule of ROUTE_PATTERNS) {
       if (!rule.languages.includes(language)) continue;
@@ -358,6 +381,10 @@ export function extractRoutes(input: RouteExtractionInput): ApiRoute[] {
       const rex = new RegExp(rule.pattern.source, rule.pattern.flags);
       let match = rex.exec(text);
       while (match !== null) {
+        if (isMaskedAt(guard, text, match.index)) {
+          match = rex.exec(text);
+          continue;
+        }
         const rawPath = match[rule.pathGroup] ?? '';
         const line = lineNumberAt(text, match.index);
         const methods = resolveMethods(rule, match);
@@ -367,7 +394,7 @@ export function extractRoutes(input: RouteExtractionInput): ApiRoute[] {
             path: normalizeRoutePath(rawPath, rule.style),
             file: file.path,
             line,
-            framework: rule.framework,
+            framework: resolveFramework(rule, input.frameworks),
             style: rule.style,
             handler: handlerFor(parsed, line),
           });
@@ -376,27 +403,44 @@ export function extractRoutes(input: RouteExtractionInput): ApiRoute[] {
       }
     }
 
-    if (GRAPHQL_PATTERN.test(text)) {
-      GRAPHQL_PATTERN.lastIndex = 0;
-      const rex = new RegExp(GRAPHQL_PATTERN.source, GRAPHQL_PATTERN.flags);
-      let match = rex.exec(text);
-      while (match !== null) {
+    const graphqlRex = new RegExp(GRAPHQL_PATTERN.source, GRAPHQL_PATTERN.flags);
+    let graphqlMatch = graphqlRex.exec(text);
+    while (graphqlMatch !== null) {
+      if (!isMaskedAt(guard, text, graphqlMatch.index)) {
         push({
           method: 'RPC',
-          path: `graphql:${(match[1] ?? 'Resolver').toLowerCase()}`,
+          path: `graphql:${(graphqlMatch[1] ?? 'Resolver').toLowerCase()}`,
           file: file.path,
-          line: lineNumberAt(text, match.index),
+          line: lineNumberAt(text, graphqlMatch.index),
           framework: 'GraphQL',
           style: 'graphql',
         });
-        match = rex.exec(text);
       }
+      graphqlMatch = graphqlRex.exec(text);
     }
   }
 
   return routes.sort(
     (a, b) => a.path.localeCompare(b.path) || a.method.localeCompare(b.method),
   );
+}
+
+/**
+ * Some frameworks share a registration syntax — `@app.get("/x")` is valid in
+ * both FastAPI and Flask 2+. When the stack detector has already identified one
+ * of them, prefer that over the pattern's nominal owner.
+ */
+const AMBIGUOUS_FRAMEWORKS: Record<string, string[]> = {
+  FastAPI: ['FastAPI', 'Flask', 'Sanic', 'Quart'],
+  'Go router': ['Gin', 'Echo', 'Fiber', 'Chi'],
+  'Actix / Rocket': ['Actix Web', 'Rocket'],
+};
+
+function resolveFramework(rule: RoutePattern, detected: Set<string> | undefined): string {
+  const alternatives = AMBIGUOUS_FRAMEWORKS[rule.framework];
+  if (!alternatives || !detected) return rule.framework;
+  const match = alternatives.find((name) => detected.has(name));
+  return match ?? rule.framework;
 }
 
 function resolveMethods(rule: RoutePattern, match: RegExpExecArray): HttpMethod[] {

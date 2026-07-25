@@ -257,7 +257,17 @@ export function buildImportGraph(input: GraphInput): DevGraphView {
   const limits = input.limits ?? DEFAULT_LIMITS;
   const cycleKeys = cyclicEdgeKeys(input.cycles.map((c) => c.files));
 
-  const nodes: GraphNode[] = input.files.map((file) => ({
+  // Only files that can participate in an import graph belong in it. Markdown,
+  // TOML and asset files would otherwise arrive as hundreds of isolated dots
+  // that dominate the layout and say nothing about dependencies.
+  const connected = new Set<string>();
+  for (const edge of input.fileEdges) {
+    connected.add(edge.from);
+    connected.add(edge.to);
+  }
+  const participating = input.files.filter((file) => file.parsed || connected.has(file.path));
+
+  const nodes: GraphNode[] = participating.map((file) => ({
     id: file.path,
     label: file.name,
     kind: file.isEntryPoint ? 'entry' : 'file',

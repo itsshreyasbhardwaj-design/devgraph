@@ -172,7 +172,6 @@ export function toInsightSection(
   result: AnalysisResult,
   topic: InsightTopic,
   body: string,
-  model: string,
 ): InsightSection {
   const valid = citablePaths(result);
   const references: InsightSection['references'] = [];

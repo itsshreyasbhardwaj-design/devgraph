@@ -1,26 +1,393 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+/*
+ * DevGraph design system — "plotter on graphite".
+ *
+ * The visual language borrows from technical drafting rather than dashboards:
+ * a graphite ground, an ultra-fine dot grid, hairline strokes, and accents that
+ * read like technical-pen ink. Glass appears only where a panel genuinely
+ * floats over the graph, so translucency carries meaning instead of decoration.
+ */
+
+@theme {
+  /* -- ground -------------------------------------------------------- */
+  --color-void: #08080c;
+  --color-pit: #0b0b11;
+  --color-surface: #101017;
+  --color-raised: #16161f;
+  --color-hover: #1d1d28;
+  --color-line: #23232f;
+  --color-line-strong: #32323f;
+
+  /* -- ink ----------------------------------------------------------- */
+  --color-ink: #ededf2;
+  --color-ink-muted: #a6a6b5;
+  --color-ink-faint: #6e6e80;
+  --color-ink-ghost: #45454f;
+
+  /* -- technical pen ------------------------------------------------- */
+  --color-edge: #7c5cff;
+  --color-edge-soft: #9d86ff;
+  --color-edge-deep: #4b32c9;
+  --color-stable: #26d7a8;
+  --color-cycle: #ff5c7a;
+  --color-warn: #ffb55c;
+  --color-signal: #4cc2ff;
+
+  /* -- typography ---------------------------------------------------- */
+  --font-display: var(--font-bricolage), 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-sans: var(--font-plex-sans), 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* -- geometry ------------------------------------------------------ */
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 7px;
+  --radius-lg: 11px;
+  --radius-xl: 16px;
+
+  /* -- motion -------------------------------------------------------- */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+
+  --background: var(--color-void);
+  --foreground: var(--color-ink);
+  --border: var(--color-line);
+  --ring: var(--color-edge);
+
+  /* The dot grid that runs under the whole product. */
+  --grid-dot: rgba(255, 255, 255, 0.045);
+  --grid-size: 22px;
+
+  /* Glass recipe — defined once, used everywhere glass appears. */
+  --glass-bg: rgba(18, 18, 25, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-highlight: rgba(255, 255, 255, 0.06);
+  --glass-blur: 18px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  border-color: var(--color-line);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-void);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: none;
+}
+
+/* Numbers and paths are machine facts — always monospaced, always tabular. */
+.tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1, 'zero' 1;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.03em;
+}
+
+/* -- utilities ------------------------------------------------------- */
+
+@utility grid-field {
+  background-image: radial-gradient(circle at 1px 1px, var(--grid-dot) 1px, transparent 0);
+  background-size: var(--grid-size) var(--grid-size);
+}
+
+@utility glass {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(150%);
+  border: 1px solid var(--glass-border);
+  box-shadow:
+    0 1px 0 0 var(--glass-highlight) inset,
+    0 16px 48px -24px rgba(0, 0, 0, 0.9);
+}
+
+@utility hairline {
+  box-shadow: 0 0 0 1px var(--color-line);
+}
+
+/* A single restrained glow, reserved for the signature graph canvas. */
+@utility ink-glow {
+  filter: drop-shadow(0 0 6px color-mix(in oklab, var(--color-edge) 45%, transparent));
+}
+
+/* -- focus, selection, scrollbars ------------------------------------ */
+
+:focus-visible {
+  outline: 2px solid var(--color-edge);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+::selection {
+  background-color: color-mix(in oklab, var(--color-edge) 40%, transparent);
+  color: var(--color-ink);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-line-strong);
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-ink-ghost);
+}
+
+/* -- React Flow theming ---------------------------------------------- */
+
+.react-flow {
+  --xy-background-color: transparent;
+  --xy-edge-stroke-default: var(--color-line-strong);
+  --xy-edge-stroke-width-default: 1;
+  --xy-edge-stroke-selected-default: var(--color-edge);
+  --xy-node-border-default: none;
+  --xy-node-background-color-default: transparent;
+  --xy-handle-background-color-default: transparent;
+  --xy-handle-border-color-default: transparent;
+}
+
+.react-flow__attribution {
+  display: none;
+}
+
+.react-flow__handle {
+  opacity: 0;
+  pointer-events: none;
+  min-width: 1px;
+  min-height: 1px;
+  width: 1px;
+  height: 1px;
+  border: 0;
+}
+
+.react-flow__edge-path {
+  transition: stroke 140ms ease, stroke-opacity 140ms ease;
+}
+
+.react-flow__minimap {
+  background-color: rgba(10, 10, 15, 0.85) !important;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+
+.react-flow__minimap-mask {
+  fill: rgba(8, 8, 12, 0.72);
+}
+
+.react-flow__controls {
+  box-shadow: none;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.react-flow__controls-button {
+  background-color: var(--color-raised);
+  border-bottom: 1px solid var(--color-line);
+  color: var(--color-ink-muted);
+  width: 27px;
+  height: 27px;
+}
+
+.react-flow__controls-button:hover {
+  background-color: var(--color-hover);
+  color: var(--color-ink);
+}
+
+.react-flow__controls-button svg {
+  fill: currentColor;
+}
+
+/* -- markdown rendered from insights --------------------------------- */
+
+.prose-devgraph {
+  color: var(--color-ink-muted);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+}
+
+.prose-devgraph > :first-child {
+  margin-top: 0;
+}
+
+.prose-devgraph strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.prose-devgraph h3 {
+  color: var(--color-ink);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 1.75rem 0 0.6rem;
+}
+
+.prose-devgraph p {
+  margin: 0.85rem 0;
+}
+
+.prose-devgraph ul {
+  margin: 0.85rem 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.prose-devgraph li {
+  position: relative;
+  padding-left: 1.15rem;
+  margin: 0.4rem 0;
+}
+
+.prose-devgraph li::before {
+  content: '';
+  position: absolute;
+  left: 0.2rem;
+  top: 0.72em;
+  width: 5px;
+  height: 1px;
+  background-color: var(--color-ink-ghost);
+}
+
+.prose-devgraph code {
+  font-family: var(--font-mono);
+  font-size: 0.8125em;
+  color: var(--color-edge-soft);
+  background-color: color-mix(in oklab, var(--color-edge) 12%, transparent);
+  padding: 0.1em 0.38em;
+  border-radius: var(--radius-xs);
+  word-break: break-all;
+}
+
+.prose-devgraph blockquote {
+  border-left: 2px solid var(--color-warn);
+  padding-left: 0.9rem;
+  margin: 1rem 0;
+  color: var(--color-ink-muted);
+}
+
+.prose-devgraph table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.prose-devgraph th {
+  text-align: left;
+  color: var(--color-ink-faint);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.66rem;
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.prose-devgraph td {
+  padding: 0.45rem 0.7rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--color-line) 60%, transparent);
+}
+
+.prose-devgraph a {
+  color: var(--color-signal);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* -- hero entrance ----------------------------------------------------
+ *
+ * Authored as CSS rather than JS animation, with `animation-fill-mode:
+ * backwards`. The resting state is the *visible* one, so a throttled or
+ * disabled animation frame loop leaves the graph fully drawn instead of blank.
+ */
+
+@keyframes hero-node-in {
+  from {
+    opacity: 0;
+    transform: translateY(9px);
+  }
+}
+
+@keyframes hero-edge-in {
+  from {
+    stroke-dashoffset: 620;
+    opacity: 0;
+  }
+}
+
+@keyframes hero-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.hero-node {
+  animation: hero-node-in 0.5s var(--ease-out-expo) backwards;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+.hero-edge {
+  stroke-dasharray: 620;
+  stroke-dashoffset: 0;
+  animation: hero-edge-in 0.75s var(--ease-out-expo) backwards;
+}
+
+.hero-edge-cycle {
+  animation: hero-fade-in 0.5s ease backwards;
+}
+
+.hero-annotation {
+  animation: hero-fade-in 0.6s ease backwards;
+}
+
+/* -- reduced motion --------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

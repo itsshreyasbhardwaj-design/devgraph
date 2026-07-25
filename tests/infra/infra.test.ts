@@ -189,13 +189,13 @@ describe('insight context', () => {
 
   it('keeps only file references that really exist', () => {
     const body = 'Look at `src/lib/db.ts` and `src/does/not/exist.ts` and `formatCurrency`.';
-    const section = toInsightSection(analysis, 'overview', body, 'test-model');
+    const section = toInsightSection(analysis, 'overview', body);
     expect(section.references.map((r) => r.path)).toEqual(['src/lib/db.ts']);
     expect(unverifiedReferences(analysis, body)).toEqual(['src/does/not/exist.ts']);
   });
 
   it('falls back to the deterministic section title', () => {
-    const section = toInsightSection(analysis, 'overview', 'Body text.', 'test-model');
+    const section = toInsightSection(analysis, 'overview', 'Body text.');
     expect(section.title).toBe('Architecture overview');
     expect(section.body).toBe('Body text.');
   });
