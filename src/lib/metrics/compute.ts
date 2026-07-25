@@ -15,6 +15,7 @@ import type {
   ParsedFile,
 } from '@/lib/core/types';
 import { moduleKeyFor } from '@/lib/core/paths';
+import { MAINTAINABILITY_THRESHOLDS } from '@/lib/parsing/complexity';
 import type { ResolvedFileEdge } from '@/lib/graph/builders';
 import { buildDebtReport } from './debt';
 
@@ -156,7 +157,7 @@ function computeMaintainability(analysed: FileRecord[]): MetricsReport['maintain
     : 100;
 
   const atRisk: MaintainabilityEntry[] = analysed
-    .filter((f) => f.maintainability < 65)
+    .filter((f) => f.maintainability < MAINTAINABILITY_THRESHOLDS.good)
     .sort((a, b) => a.maintainability - b.maintainability)
     .slice(0, 40)
     .map((f) => ({
@@ -170,10 +171,18 @@ function computeMaintainability(analysed: FileRecord[]): MetricsReport['maintain
     average,
     atRisk,
     histogram: histogram(scores, [
-      { label: 'Poor (0–49)', from: -1, to: 50 },
-      { label: 'Moderate (50–69)', from: 50, to: 70 },
-      { label: 'Good (70–84)', from: 70, to: 85 },
-      { label: 'Excellent (85+)', from: 85, to: Infinity },
+      { label: 'Poor (<10)', from: -1, to: MAINTAINABILITY_THRESHOLDS.moderate },
+      {
+        label: 'Moderate (10–19)',
+        from: MAINTAINABILITY_THRESHOLDS.moderate,
+        to: MAINTAINABILITY_THRESHOLDS.good,
+      },
+      {
+        label: 'Good (20–39)',
+        from: MAINTAINABILITY_THRESHOLDS.good,
+        to: MAINTAINABILITY_THRESHOLDS.excellent,
+      },
+      { label: 'Excellent (40+)', from: MAINTAINABILITY_THRESHOLDS.excellent, to: Infinity },
     ]),
   };
 }
@@ -204,7 +213,8 @@ function computeCoupling(input: MetricsInput): CouplingReport {
       path: f.path,
       fanIn: f.fanIn,
       fanOut: f.fanOut,
-      instability: f.fanIn + f.fanOut > 0 ? Number((f.fanOut / (f.fanIn + f.fanOut)).toFixed(3)) : 0,
+      instability:
+        f.fanIn + f.fanOut > 0 ? Number((f.fanOut / (f.fanIn + f.fanOut)).toFixed(3)) : 0,
     }));
 
   const totalFanIn = entries.reduce((sum, e) => sum + e.fanIn, 0);

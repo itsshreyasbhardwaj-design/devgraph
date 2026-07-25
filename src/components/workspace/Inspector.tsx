@@ -4,6 +4,7 @@ import * as React from 'react';
 import { ArrowDownLeft, ArrowUpRight, ExternalLink, Scan, X } from 'lucide-react';
 import type { AnalysisResult, GraphEdge, GraphNode } from '@/lib/core/types';
 import { LANGUAGE_LABELS } from '@/lib/core/languages';
+import { MAINTAINABILITY_THRESHOLDS, maintainabilityBand } from '@/lib/parsing/complexity';
 import { directNeighbours } from '@/lib/client/store';
 import { Button } from '@/components/ui/button';
 import {
@@ -64,11 +65,11 @@ export function Inspector({
         <header className="flex items-start justify-between gap-2">
           <div className="min-w-0">
             <Eyebrow>{labelForKind(node)}</Eyebrow>
-            <h2 className="tabular mt-1.5 break-all text-[14px] font-medium leading-snug text-ink">
+            <h2 className="tabular text-ink mt-1.5 text-[14px] leading-snug font-medium break-all">
               {node.label}
             </h2>
             {node.path ? (
-              <p className="tabular mt-1 break-all text-[11px] text-ink-faint">
+              <p className="tabular text-ink-faint mt-1 text-[11px] break-all">
                 {node.path}
                 {node.line ? `:${node.line}` : ''}
               </p>
@@ -80,11 +81,11 @@ export function Inspector({
         </header>
 
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {node.language ? (
-            <Badge>{LANGUAGE_LABELS[node.language] ?? node.language}</Badge>
-          ) : null}
+          {node.language ? <Badge>{LANGUAGE_LABELS[node.language] ?? node.language}</Badge> : null}
           {node.group ? <Badge tone="ghost">{node.group}</Badge> : null}
-          {node.kind === 'entry' || file?.isEntryPoint ? <Badge tone="good">Entry point</Badge> : null}
+          {node.kind === 'entry' || file?.isEntryPoint ? (
+            <Badge tone="good">Entry point</Badge>
+          ) : null}
           {file?.isTest ? <Badge tone="ghost">Test</Badge> : null}
           {file?.isGenerated ? <Badge tone="ghost">Generated</Badge> : null}
           {cycle ? <Badge tone="bad">In a {cycle.length}-file cycle</Badge> : null}
@@ -142,7 +143,13 @@ export function Inspector({
                 <Metric
                   label="Coverage"
                   value={`${node.metrics.coverage.toFixed(0)}%`}
-                  tone={node.metrics.coverage > 70 ? 'good' : node.metrics.coverage > 40 ? 'warn' : 'bad'}
+                  tone={
+                    node.metrics.coverage > 70
+                      ? 'good'
+                      : node.metrics.coverage > 40
+                        ? 'warn'
+                        : 'bad'
+                  }
                 />
               ) : null}
             </dl>
@@ -150,19 +157,23 @@ export function Inspector({
             {node.metrics.maintainability !== undefined ? (
               <div className="mt-4">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-[11.5px] text-ink-muted">Maintainability</span>
-                  <span className="tabular text-[11.5px] text-ink">
+                  <span className="text-ink-muted text-[11.5px]">Maintainability</span>
+                  <span className="tabular text-ink text-[11.5px]">
                     {node.metrics.maintainability.toFixed(0)}
-                    <span className="text-ink-ghost">/100</span>
+                    {/* The band is stated because this scale is not linear-intuitive:
+                        on a per-file SEI index, 25 is healthy, not a failure. */}
+                    <span className="text-ink-ghost ml-1.5">
+                      {maintainabilityBand(node.metrics.maintainability)}
+                    </span>
                   </span>
                 </div>
                 <Progress
                   className="mt-1.5"
                   value={node.metrics.maintainability}
                   tone={
-                    node.metrics.maintainability > 70
+                    node.metrics.maintainability >= MAINTAINABILITY_THRESHOLDS.good
                       ? 'good'
-                      : node.metrics.maintainability > 50
+                      : node.metrics.maintainability >= MAINTAINABILITY_THRESHOLDS.moderate
                         ? 'warn'
                         : 'bad'
                   }
@@ -173,13 +184,13 @@ export function Inspector({
             {node.metrics.instability !== undefined ? (
               <div className="mt-3">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-[11.5px] text-ink-muted">Instability</span>
-                  <span className="tabular text-[11.5px] text-ink">
+                  <span className="text-ink-muted text-[11.5px]">Instability</span>
+                  <span className="tabular text-ink text-[11.5px]">
                     {node.metrics.instability.toFixed(2)}
                   </span>
                 </div>
                 <Progress className="mt-1.5" value={node.metrics.instability * 100} tone="accent" />
-                <p className="mt-1.5 text-[10.5px] leading-relaxed text-ink-ghost">
+                <p className="text-ink-ghost mt-1.5 text-[10.5px] leading-relaxed">
                   {node.metrics.instability > 0.7
                     ? 'Depends on much, is depended on by little — a good place for volatile code.'
                     : node.metrics.instability < 0.3
@@ -242,13 +253,13 @@ function NodeDetail({ node }: { node: GraphNode }) {
       {signature ? (
         <div className="mb-3">
           <Eyebrow className="pb-1.5">Signature</Eyebrow>
-          <code className="tabular block break-all rounded-sm border border-line bg-pit px-2 py-1.5 text-[11px] text-ink-muted">
+          <code className="tabular border-line bg-pit text-ink-muted block rounded-sm border px-2 py-1.5 text-[11px] break-all">
             {signature}
           </code>
         </div>
       ) : null}
       {doc ? (
-        <p className="mb-3 border-l-2 border-line pl-2.5 text-[11.5px] leading-relaxed text-ink-faint">
+        <p className="border-line text-ink-faint mb-3 border-l-2 pl-2.5 text-[11.5px] leading-relaxed">
           {doc}
         </p>
       ) : null}
@@ -259,12 +270,12 @@ function NodeDetail({ node }: { node: GraphNode }) {
           </Eyebrow>
           <ul className="space-y-0.5">
             {section.items.slice(0, 20).map((item) => (
-              <li key={item} className="tabular truncate text-[11px] text-ink-muted">
+              <li key={item} className="tabular text-ink-muted truncate text-[11px]">
                 {item}
               </li>
             ))}
             {section.items.length > 20 ? (
-              <li className="text-[10.5px] text-ink-ghost">+{section.items.length - 20} more</li>
+              <li className="text-ink-ghost text-[10.5px]">+{section.items.length - 20} more</li>
             ) : null}
           </ul>
         </div>
@@ -297,7 +308,7 @@ function NeighbourList({
         {title} · {edges.length}
       </Eyebrow>
       {edges.length === 0 ? (
-        <p className="text-[11px] text-ink-ghost">None in this view.</p>
+        <p className="text-ink-ghost text-[11px]">None in this view.</p>
       ) : (
         <ul className="space-y-0.5">
           {edges.slice(0, 40).map((edge) => {
@@ -322,7 +333,7 @@ function NeighbourList({
             );
           })}
           {edges.length > 40 ? (
-            <li className="px-1.5 text-[10.5px] text-ink-ghost">+{edges.length - 40} more</li>
+            <li className="text-ink-ghost px-1.5 text-[10.5px]">+{edges.length - 40} more</li>
           ) : null}
         </ul>
       )}
@@ -348,7 +359,7 @@ function Metric({
 
   return (
     <div>
-      <dt className="text-[10.5px] uppercase tracking-[0.1em] text-ink-ghost">{label}</dt>
+      <dt className="text-ink-ghost text-[10.5px] tracking-[0.1em] uppercase">{label}</dt>
       <dd className={cn('tabular mt-1 text-[15px] leading-none', toneClass)}>{value}</dd>
     </div>
   );

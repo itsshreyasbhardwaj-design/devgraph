@@ -14,8 +14,7 @@ const buttonVariants = cva(
           'bg-ink text-void hover:bg-white active:scale-[0.985] shadow-[0_1px_0_0_rgba(255,255,255,0.2)_inset]',
         accent:
           'bg-edge text-white hover:bg-edge-soft active:scale-[0.985] shadow-[0_1px_0_0_rgba(255,255,255,0.18)_inset,0_8px_24px_-12px_var(--color-edge)]',
-        outline:
-          'border border-line bg-raised/60 text-ink hover:bg-hover hover:border-line-strong',
+        outline: 'border border-line bg-raised/60 text-ink hover:bg-hover hover:border-line-strong',
         ghost: 'text-ink-muted hover:bg-hover hover:text-ink',
         subtle: 'bg-raised text-ink-muted hover:bg-hover hover:text-ink',
         danger: 'border border-cycle/40 bg-cycle/10 text-cycle hover:bg-cycle/20',
@@ -35,8 +34,7 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 

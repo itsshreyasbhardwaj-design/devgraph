@@ -16,7 +16,16 @@ import { basename, dirname } from '@/lib/core/paths';
  */
 
 const METHODS = new Set<HttpMethod>([
-  'GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS', 'ALL', 'WS', 'RPC',
+  'GET',
+  'POST',
+  'PUT',
+  'PATCH',
+  'DELETE',
+  'HEAD',
+  'OPTIONS',
+  'ALL',
+  'WS',
+  'RPC',
 ]);
 
 interface RoutePattern {
@@ -37,7 +46,8 @@ const ROUTE_PATTERNS: RoutePattern[] = [
     framework: 'Express',
     style: 'rest',
     languages: ['javascript', 'typescript'],
-    pattern: /\b(?:app|router|api|server)\s*\.\s*(get|post|put|patch|delete|head|options|all)\s*\(\s*(['"`])([^'"`]+)\2/gi,
+    pattern:
+      /\b(?:app|router|api|server)\s*\.\s*(get|post|put|patch|delete|head|options|all)\s*\(\s*(['"`])([^'"`]+)\2/gi,
     methodGroup: 1,
     pathGroup: 3,
   },
@@ -45,7 +55,8 @@ const ROUTE_PATTERNS: RoutePattern[] = [
     framework: 'Fastify',
     style: 'rest',
     languages: ['javascript', 'typescript'],
-    pattern: /\b(?:fastify|app|server)\s*\.\s*route\s*\(\s*\{[^}]*?method\s*:\s*['"`](\w+)['"`][^}]*?url\s*:\s*['"`]([^'"`]+)['"`]/gi,
+    pattern:
+      /\b(?:fastify|app|server)\s*\.\s*route\s*\(\s*\{[^}]*?method\s*:\s*['"`](\w+)['"`][^}]*?url\s*:\s*['"`]([^'"`]+)['"`]/gi,
     methodGroup: 1,
     pathGroup: 2,
   },
@@ -53,7 +64,8 @@ const ROUTE_PATTERNS: RoutePattern[] = [
     framework: 'Hono',
     style: 'rest',
     languages: ['javascript', 'typescript'],
-    pattern: /\bnew Hono\(\)[\s\S]{0,4000}?\.\s*(get|post|put|patch|delete|all)\s*\(\s*(['"`])([^'"`]+)\2/gi,
+    pattern:
+      /\bnew Hono\(\)[\s\S]{0,4000}?\.\s*(get|post|put|patch|delete|all)\s*\(\s*(['"`])([^'"`]+)\2/gi,
     methodGroup: 1,
     pathGroup: 3,
   },
@@ -111,7 +123,8 @@ const ROUTE_PATTERNS: RoutePattern[] = [
     framework: 'net/http',
     style: 'rest',
     languages: ['go'],
-    pattern: /\b(?:http|mux|r)\s*\.\s*Handle(?:Func)?\s*\(\s*"((?:GET|POST|PUT|PATCH|DELETE)\s+)?([^"]+)"/g,
+    pattern:
+      /\b(?:http|mux|r)\s*\.\s*Handle(?:Func)?\s*\(\s*"((?:GET|POST|PUT|PATCH|DELETE)\s+)?([^"]+)"/g,
     methodGroup: 1,
     pathGroup: 2,
   },
@@ -145,7 +158,8 @@ const ROUTE_PATTERNS: RoutePattern[] = [
     framework: 'Spring',
     style: 'rest',
     languages: ['java', 'kotlin'],
-    pattern: /@RequestMapping\s*\(\s*(?:value\s*=\s*)?"([^"]*)"(?:[^)]*method\s*=\s*RequestMethod\.(\w+))?/g,
+    pattern:
+      /@RequestMapping\s*\(\s*(?:value\s*=\s*)?"([^"]*)"(?:[^)]*method\s*=\s*RequestMethod\.(\w+))?/g,
     pathGroup: 1,
     methodGroup: 2,
   },
@@ -193,7 +207,8 @@ const ROUTE_PATTERNS: RoutePattern[] = [
   },
 ];
 
-const GRAPHQL_PATTERN = /\b(?:type\s+(Query|Mutation|Subscription)\s*\{|@(?:Query|Mutation|Subscription)\s*\()/g;
+const GRAPHQL_PATTERN =
+  /\b(?:type\s+(Query|Mutation|Subscription)\s*\{|@(?:Query|Mutation|Subscription)\s*\()/g;
 
 // ---------------------------------------------------------------------------
 // File-convention routers
@@ -232,19 +247,32 @@ function normalizeSegments(raw: string): string {
   return `/${segments.join('/')}`.replace(/\/+/g, '/');
 }
 
-function detectConvention(file: SourceFile, parsed: ParsedFile | undefined): ConventionResult | undefined {
+function detectConvention(
+  file: SourceFile,
+  parsed: ParsedFile | undefined,
+): ConventionResult | undefined {
   const path = file.path;
 
   // Next.js App Router
-  if (/(?:^|\/)(?:src\/)?app\/.*route\.(t|j)sx?$/.test(path) || /(?:^|\/)(?:src\/)?app\/route\.(t|j)sx?$/.test(path)) {
+  if (
+    /(?:^|\/)(?:src\/)?app\/.*route\.(t|j)sx?$/.test(path) ||
+    /(?:^|\/)(?:src\/)?app\/route\.(t|j)sx?$/.test(path)
+  ) {
     const routePath = nextAppRouterPath(path) ?? nextAppRootPath(path) ?? '/';
     const methods = (parsed?.exports ?? [])
       .map((e) => e.name.toUpperCase())
       .filter((name): name is HttpMethod => METHODS.has(name as HttpMethod));
-    return { path: routePath, framework: 'Next.js Route Handler', methods: methods.length ? methods : ['GET'] };
+    return {
+      path: routePath,
+      framework: 'Next.js Route Handler',
+      methods: methods.length ? methods : ['GET'],
+    };
   }
 
-  if (/(?:^|\/)(?:src\/)?app\/.*page\.(t|j)sx?$/.test(path) || /(?:^|\/)(?:src\/)?app\/page\.(t|j)sx?$/.test(path)) {
+  if (
+    /(?:^|\/)(?:src\/)?app\/.*page\.(t|j)sx?$/.test(path) ||
+    /(?:^|\/)(?:src\/)?app\/page\.(t|j)sx?$/.test(path)
+  ) {
     const routePath = nextAppRouterPath(path) ?? nextAppRootPath(path) ?? '/';
     return { path: routePath, framework: 'Next.js Page', methods: ['GET'] };
   }
@@ -420,9 +448,7 @@ export function extractRoutes(input: RouteExtractionInput): ApiRoute[] {
     }
   }
 
-  return routes.sort(
-    (a, b) => a.path.localeCompare(b.path) || a.method.localeCompare(b.method),
-  );
+  return routes.sort((a, b) => a.path.localeCompare(b.path) || a.method.localeCompare(b.method));
 }
 
 /**
@@ -466,7 +492,8 @@ function normalizeRoutePath(raw: string, style: ApiRoute['style']): string {
   if (style === 'trpc') return `trpc:${raw}`;
   const trimmed = raw.trim();
   if (!trimmed) return '/';
-  const withSlash = trimmed.startsWith('/') || trimmed.startsWith('trpc:') ? trimmed : `/${trimmed}`;
+  const withSlash =
+    trimmed.startsWith('/') || trimmed.startsWith('trpc:') ? trimmed : `/${trimmed}`;
   return withSlash.replace(/\/+/g, '/').replace(/(.)\/$/, '$1');
 }
 

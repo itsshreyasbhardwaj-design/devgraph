@@ -2,7 +2,8 @@ import type { ImportRef, SymbolKind, Visibility } from '@/lib/core/types';
 import { lineAt, SYNTAX_PROFILES, type ScanResult } from '../scanner';
 import { createClassLanguageParser, splitTypeList } from './classLanguage';
 
-const USING_DECL = /^[ \t]*(?:global\s+)?using\s+(?:static\s+)?(?:[\w]+\s*=\s*)?([\w.<>, ]+?)\s*;/gm;
+const USING_DECL =
+  /^[ \t]*(?:global\s+)?using\s+(?:static\s+)?(?:[\w]+\s*=\s*)?([\w.<>, ]+?)\s*;/gm;
 const NAMESPACE_DECL = /^[ \t]*namespace\s+([\w.]+)/m;
 
 const MODIFIERS =

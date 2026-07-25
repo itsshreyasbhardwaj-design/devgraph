@@ -24,8 +24,8 @@ export default function AnalyzePage() {
 function Loading() {
   return (
     <div className="flex min-h-dvh items-center justify-center">
-      <div className="flex items-center gap-2.5 text-[13px] text-ink-faint">
-        <span className="size-1.5 animate-pulse rounded-full bg-edge" />
+      <div className="text-ink-faint flex items-center gap-2.5 text-[13px]">
+        <span className="bg-edge size-1.5 animate-pulse rounded-full" />
         Preparing workspace
       </div>
     </div>

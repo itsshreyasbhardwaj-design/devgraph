@@ -37,12 +37,12 @@ export function sampleRepoFiles(): SourceFile[] {
       JSON.stringify({ compilerOptions: { baseUrl: '.', paths: { '@/*': ['src/*'] } } }, null, 2),
     ),
     file('next.config.ts', 'export default {};\n'),
-    file('.github/workflows/ci.yml', 'name: CI\non: [push]\njobs:\n  build:\n    runs-on: ubuntu-latest\n'),
-    file('Dockerfile', 'FROM node:22\nENV PORT=3000\nARG BUILD_ID\n'),
     file(
-      '.env.example',
-      'DATABASE_URL=\nCLERK_SECRET_KEY=\nNEXT_PUBLIC_API_SECRET=\nPORT=3000\n',
+      '.github/workflows/ci.yml',
+      'name: CI\non: [push]\njobs:\n  build:\n    runs-on: ubuntu-latest\n',
     ),
+    file('Dockerfile', 'FROM node:22\nENV PORT=3000\nARG BUILD_ID\n'),
+    file('.env.example', 'DATABASE_URL=\nCLERK_SECRET_KEY=\nNEXT_PUBLIC_API_SECRET=\nPORT=3000\n'),
 
     file(
       'prisma/schema.prisma',

@@ -51,11 +51,11 @@ export function RunProgress({ run, label, onRetry }: RunProgressProps) {
     return (
       <div className="flex min-h-[70vh] items-center justify-center px-5">
         <div className="w-full max-w-md text-center">
-          <div className="mx-auto flex size-10 items-center justify-center rounded-md border border-cycle/40 bg-cycle/10">
-            <AlertCircle className="size-4 text-cycle" />
+          <div className="border-cycle/40 bg-cycle/10 mx-auto flex size-10 items-center justify-center rounded-md border">
+            <AlertCircle className="text-cycle size-4" />
           </div>
-          <h2 className="mt-5 font-display text-lg font-semibold text-ink">Analysis failed</h2>
-          <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">{run.error}</p>
+          <h2 className="font-display text-ink mt-5 text-lg font-semibold">Analysis failed</h2>
+          <p className="text-ink-muted mt-2 text-[13px] leading-relaxed">{run.error}</p>
           <div className="mt-6 flex items-center justify-center gap-2">
             <Button variant="outline" size="sm" asChild>
               <Link href="/">
@@ -77,27 +77,28 @@ export function RunProgress({ run, label, onRetry }: RunProgressProps) {
   return (
     <div className="flex min-h-[70vh] items-center justify-center px-5">
       <div className="w-full max-w-md">
-        <p className="tabular text-[11px] uppercase tracking-[0.16em] text-ink-ghost">Analysing</p>
-        <h2 className="tabular mt-2 break-all font-display text-xl font-semibold text-ink">
+        <p className="tabular text-ink-ghost text-[11px] tracking-[0.16em] uppercase">Analysing</p>
+        <h2 className="tabular font-display text-ink mt-2 text-xl font-semibold break-all">
           {label}
         </h2>
 
         <div className="mt-6">
           <div className="flex items-baseline justify-between">
-            <span className="text-[12.5px] text-ink-muted">
+            <span className="text-ink-muted text-[12.5px]">
               {progress?.message ?? 'Starting up'}
             </span>
-            <span className="tabular text-[12px] text-ink-faint">{percent}%</span>
+            <span className="tabular text-ink-faint text-[12px]">{percent}%</span>
           </div>
           <Progress className="mt-2" value={percent} />
           {progress?.detail ? (
-            <p className="tabular mt-2 text-[11px] text-ink-ghost">{progress.detail}</p>
+            <p className="tabular text-ink-ghost mt-2 text-[11px]">{progress.detail}</p>
           ) : null}
         </div>
 
         <ol className="mt-8 space-y-2.5">
           {PHASES.map((phase, index) => {
-            const state = index < currentIndex ? 'done' : index === currentIndex ? 'active' : 'todo';
+            const state =
+              index < currentIndex ? 'done' : index === currentIndex ? 'active' : 'todo';
             return (
               <li key={phase.id} className="flex items-center gap-2.5">
                 <span
@@ -113,7 +114,7 @@ export function RunProgress({ run, label, onRetry }: RunProgressProps) {
                   {state === 'done' ? (
                     <Check className="size-2.5" />
                   ) : state === 'active' ? (
-                    <span className="size-1.5 animate-pulse rounded-full bg-edge" />
+                    <span className="bg-edge size-1.5 animate-pulse rounded-full" />
                   ) : null}
                 </span>
                 <span
@@ -134,13 +135,13 @@ export function RunProgress({ run, label, onRetry }: RunProgressProps) {
         </ol>
 
         {run.warnings.length ? (
-          <div className="mt-8 rounded-md border border-line bg-raised/60 p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-ghost">
+          <div className="border-line bg-raised/60 mt-8 rounded-md border p-3">
+            <p className="text-ink-ghost text-[10px] font-semibold tracking-[0.14em] uppercase">
               Notes
             </p>
             <ul className="mt-2 space-y-1">
               {run.warnings.slice(-4).map((warning, index) => (
-                <li key={index} className="text-[11.5px] leading-relaxed text-ink-faint">
+                <li key={index} className="text-ink-faint text-[11.5px] leading-relaxed">
                   {warning}
                 </li>
               ))}

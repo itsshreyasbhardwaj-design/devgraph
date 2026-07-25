@@ -74,7 +74,10 @@ function commonRoot(names: string[]): string | undefined {
   return allShare ? first : undefined;
 }
 
-export function validateUpload(file: { size: number; name: string; type: string }, limits: IngestLimits = DEFAULT_INGEST_LIMITS): void {
+export function validateUpload(
+  file: { size: number; name: string; type: string },
+  limits: IngestLimits = DEFAULT_INGEST_LIMITS,
+): void {
   if (file.size > limits.maxArchiveBytes) {
     throw new IngestError(
       `Upload is ${(file.size / 1024 / 1024).toFixed(1)} MB, over the ${(

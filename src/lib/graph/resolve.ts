@@ -63,28 +63,147 @@ const TS_INDEXES = [
 ];
 
 const NODE_BUILTINS = new Set([
-  'assert', 'buffer', 'child_process', 'cluster', 'console', 'constants', 'crypto', 'dgram',
-  'dns', 'domain', 'events', 'fs', 'http', 'http2', 'https', 'inspector', 'module', 'net',
-  'os', 'path', 'perf_hooks', 'process', 'punycode', 'querystring', 'readline', 'repl',
-  'stream', 'string_decoder', 'timers', 'tls', 'trace_events', 'tty', 'url', 'util', 'v8',
-  'vm', 'wasi', 'worker_threads', 'zlib',
+  'assert',
+  'buffer',
+  'child_process',
+  'cluster',
+  'console',
+  'constants',
+  'crypto',
+  'dgram',
+  'dns',
+  'domain',
+  'events',
+  'fs',
+  'http',
+  'http2',
+  'https',
+  'inspector',
+  'module',
+  'net',
+  'os',
+  'path',
+  'perf_hooks',
+  'process',
+  'punycode',
+  'querystring',
+  'readline',
+  'repl',
+  'stream',
+  'string_decoder',
+  'timers',
+  'tls',
+  'trace_events',
+  'tty',
+  'url',
+  'util',
+  'v8',
+  'vm',
+  'wasi',
+  'worker_threads',
+  'zlib',
 ]);
 
 const PYTHON_BUILTINS = new Set([
-  'abc', 'argparse', 'ast', 'asyncio', 'base64', 'collections', 'contextlib', 'copy', 'csv',
-  'dataclasses', 'datetime', 'decimal', 'enum', 'functools', 'glob', 'hashlib', 'heapq', 'hmac',
-  'html', 'http', 'importlib', 'inspect', 'io', 'itertools', 'json', 'logging', 'math',
-  'multiprocessing', 'operator', 'os', 'pathlib', 'pickle', 'random', 're', 'secrets', 'shutil',
-  'signal', 'socket', 'sqlite3', 'string', 'struct', 'subprocess', 'sys', 'tempfile', 'textwrap',
-  'threading', 'time', 'traceback', 'types', 'typing', 'unittest', 'urllib', 'uuid', 'warnings',
-  'weakref', 'xml', 'zipfile',
+  'abc',
+  'argparse',
+  'ast',
+  'asyncio',
+  'base64',
+  'collections',
+  'contextlib',
+  'copy',
+  'csv',
+  'dataclasses',
+  'datetime',
+  'decimal',
+  'enum',
+  'functools',
+  'glob',
+  'hashlib',
+  'heapq',
+  'hmac',
+  'html',
+  'http',
+  'importlib',
+  'inspect',
+  'io',
+  'itertools',
+  'json',
+  'logging',
+  'math',
+  'multiprocessing',
+  'operator',
+  'os',
+  'pathlib',
+  'pickle',
+  'random',
+  're',
+  'secrets',
+  'shutil',
+  'signal',
+  'socket',
+  'sqlite3',
+  'string',
+  'struct',
+  'subprocess',
+  'sys',
+  'tempfile',
+  'textwrap',
+  'threading',
+  'time',
+  'traceback',
+  'types',
+  'typing',
+  'unittest',
+  'urllib',
+  'uuid',
+  'warnings',
+  'weakref',
+  'xml',
+  'zipfile',
 ]);
 
 const GO_BUILTIN_PREFIXES = [
-  'archive/', 'bufio', 'bytes', 'compress/', 'container/', 'context', 'crypto', 'database/',
-  'encoding', 'errors', 'flag', 'fmt', 'go/', 'hash', 'html', 'image', 'io', 'log', 'math',
-  'mime', 'net', 'os', 'path', 'reflect', 'regexp', 'runtime', 'sort', 'strconv', 'strings',
-  'sync', 'syscall', 'testing', 'text/', 'time', 'unicode', 'unsafe', 'embed', 'slices', 'maps',
+  'archive/',
+  'bufio',
+  'bytes',
+  'compress/',
+  'container/',
+  'context',
+  'crypto',
+  'database/',
+  'encoding',
+  'errors',
+  'flag',
+  'fmt',
+  'go/',
+  'hash',
+  'html',
+  'image',
+  'io',
+  'log',
+  'math',
+  'mime',
+  'net',
+  'os',
+  'path',
+  'reflect',
+  'regexp',
+  'runtime',
+  'sort',
+  'strconv',
+  'strings',
+  'sync',
+  'syscall',
+  'testing',
+  'text/',
+  'time',
+  'unicode',
+  'unsafe',
+  'embed',
+  'slices',
+  'maps',
 ];
 
 const JAVA_BUILTIN_PREFIXES = ['java.', 'javax.', 'jakarta.', 'jdk.', 'sun.'];
@@ -131,7 +250,9 @@ export class ImportResolver {
       this.tsAliases.push({
         prefix,
         suffix,
-        targets: targets.map((target) => normalizePath(joinBase(manifests.tsconfig?.baseUrl, target))),
+        targets: targets.map((target) =>
+          normalizePath(joinBase(manifests.tsconfig?.baseUrl, target)),
+        ),
       });
     }
     // Sort longest prefix first so `@/lib/*` beats `@/*`.
@@ -147,7 +268,11 @@ export class ImportResolver {
     return result;
   }
 
-  private resolveUncached(fromFile: string, specifier: string, language: LanguageId): ResolvedImport {
+  private resolveUncached(
+    fromFile: string,
+    specifier: string,
+    language: LanguageId,
+  ): ResolvedImport {
     switch (language) {
       case 'typescript':
       case 'javascript':
@@ -186,9 +311,10 @@ export class ImportResolver {
     for (const alias of this.tsAliases) {
       if (!specifier.startsWith(alias.prefix)) continue;
       const rest = specifier.slice(alias.prefix.length);
-      const tail = alias.suffix && rest.endsWith(alias.suffix)
-        ? rest.slice(0, rest.length - alias.suffix.length)
-        : rest;
+      const tail =
+        alias.suffix && rest.endsWith(alias.suffix)
+          ? rest.slice(0, rest.length - alias.suffix.length)
+          : rest;
       for (const target of alias.targets) {
         const candidate = normalizePath(target.replace('*', tail));
         const found = this.probe(candidate, TS_EXTENSIONS, TS_INDEXES);
@@ -209,8 +335,16 @@ export class ImportResolver {
     if (workspaceTarget) {
       const subpath = specifier.slice(packageName.length).replace(/^\//, '');
       const found =
-        this.probe(normalizePath(`${workspaceTarget}/${subpath || 'index'}`), TS_EXTENSIONS, TS_INDEXES) ??
-        this.probe(normalizePath(`${workspaceTarget}/src/${subpath || 'index'}`), TS_EXTENSIONS, TS_INDEXES);
+        this.probe(
+          normalizePath(`${workspaceTarget}/${subpath || 'index'}`),
+          TS_EXTENSIONS,
+          TS_INDEXES,
+        ) ??
+        this.probe(
+          normalizePath(`${workspaceTarget}/src/${subpath || 'index'}`),
+          TS_EXTENSIONS,
+          TS_INDEXES,
+        );
       if (found) return { specifier, target: found, external: false };
     }
 
@@ -325,7 +459,8 @@ export class ImportResolver {
     const direct = this.byNamespaceType.get(specifier)?.[0];
     if (direct) return { specifier, target: direct, external: false };
     const builtin = CSHARP_BUILTIN_PREFIXES.some(
-      (prefix) => specifier === prefix || specifier.startsWith(`${prefix}.`) || specifier.startsWith(prefix),
+      (prefix) =>
+        specifier === prefix || specifier.startsWith(`${prefix}.`) || specifier.startsWith(prefix),
     );
     return {
       specifier,

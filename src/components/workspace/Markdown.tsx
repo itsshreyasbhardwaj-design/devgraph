@@ -106,7 +106,11 @@ function parseBlocks(source: string): Block[] {
         items.push(lines[index].replace(/^\s*[-*+]\s+/, ''));
         index += 1;
         // Fold hanging continuation lines into the current item.
-        while (index < lines.length && /^\s{2,}\S/.test(lines[index]) && !/^\s*[-*+]\s/.test(lines[index])) {
+        while (
+          index < lines.length &&
+          /^\s{2,}\S/.test(lines[index]) &&
+          !/^\s*[-*+]\s/.test(lines[index])
+        ) {
           items[items.length - 1] += ` ${lines[index].trim()}`;
           index += 1;
         }
@@ -190,8 +194,8 @@ function Block({ block, ...rest }: { block: Block } & RenderProps) {
       );
     case 'code':
       return (
-        <pre className="my-3 overflow-x-auto rounded-md border border-line bg-pit p-3">
-          <code className="tabular text-[12px] text-ink-muted">{block.text}</code>
+        <pre className="border-line bg-pit my-3 overflow-x-auto rounded-md border p-3">
+          <code className="tabular text-ink-muted text-[12px]">{block.text}</code>
         </pre>
       );
     case 'table':
@@ -249,7 +253,7 @@ function Inline({ text, onFileClick, knownPaths }: { text: string } & RenderProp
             key={key}
             type="button"
             onClick={() => onFileClick(path)}
-            className="cursor-pointer border-b border-dotted border-edge/40 transition-colors hover:border-edge"
+            className="border-edge/40 hover:border-edge cursor-pointer border-b border-dotted transition-colors"
             title={`Show ${path} in the graph`}
           >
             <code>{value}</code>

@@ -109,16 +109,16 @@ export function CommandPalette({
       >
         <DialogTitle className="sr-only">Search the analysis</DialogTitle>
         <Command shouldFilter={false} loop className="flex max-h-[62vh] flex-col">
-          <div className="flex items-center gap-2.5 border-b border-line px-4">
-            <Search className="size-4 shrink-0 text-ink-ghost" />
+          <div className="border-line flex items-center gap-2.5 border-b px-4">
+            <Search className="text-ink-ghost size-4 shrink-0" />
             <Command.Input
               value={query}
               onValueChange={setQuery}
               autoFocus
               placeholder="Search files, classes, functions, routes, tables, config…"
-              className="tabular h-12 flex-1 bg-transparent text-[13.5px] text-ink outline-none placeholder:text-ink-ghost"
+              className="tabular text-ink placeholder:text-ink-ghost h-12 flex-1 bg-transparent text-[13.5px] outline-none"
             />
-            <kbd className="tabular hidden shrink-0 rounded-xs border border-line px-1.5 py-0.5 text-[10px] text-ink-ghost sm:block">
+            <kbd className="tabular border-line text-ink-ghost hidden shrink-0 rounded-xs border px-1.5 py-0.5 text-[10px] sm:block">
               ESC
             </kbd>
           </div>
@@ -126,16 +126,16 @@ export function CommandPalette({
           <Command.List className="flex-1 overflow-y-auto p-2">
             {query.trim() === '' ? (
               <div className="px-3 py-8 text-center">
-                <p className="text-[13px] text-ink-faint">
+                <p className="text-ink-faint text-[13px]">
                   {result.searchIndex.length.toLocaleString()} symbols indexed
                 </p>
-                <p className="mt-1.5 text-[11.5px] text-ink-ghost">
+                <p className="text-ink-ghost mt-1.5 text-[11.5px]">
                   Type to search. Selecting a result opens the view that contains it.
                 </p>
               </div>
             ) : null}
 
-            <Command.Empty className="px-3 py-8 text-center text-[13px] text-ink-faint">
+            <Command.Empty className="text-ink-faint px-3 py-8 text-center text-[13px]">
               No match for &ldquo;{query}&rdquo;.
             </Command.Empty>
 
@@ -145,7 +145,7 @@ export function CommandPalette({
                 <Command.Group
                   key={kind}
                   heading={
-                    <span className="px-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-ghost">
+                    <span className="text-ink-ghost px-2 text-[10px] font-semibold tracking-[0.14em] uppercase">
                       {KIND_LABEL[kind] ?? kind}
                     </span>
                   }
@@ -162,15 +162,15 @@ export function CommandPalette({
                         'text-ink-muted',
                       )}
                     >
-                      <Icon className="size-3.5 shrink-0 text-ink-ghost" />
+                      <Icon className="text-ink-ghost size-3.5 shrink-0" />
                       <span className="tabular min-w-0 flex-1 truncate">{entry.label}</span>
                       {entry.path ? (
-                        <span className="tabular hidden shrink-0 text-[10.5px] text-ink-ghost sm:block">
+                        <span className="tabular text-ink-ghost hidden shrink-0 text-[10.5px] sm:block">
                           {truncatePath(entry.path, 40)}
                           {entry.line ? `:${entry.line}` : ''}
                         </span>
                       ) : entry.detail ? (
-                        <span className="hidden shrink-0 text-[10.5px] text-ink-ghost sm:block">
+                        <span className="text-ink-ghost hidden shrink-0 text-[10.5px] sm:block">
                           {entry.detail}
                         </span>
                       ) : null}

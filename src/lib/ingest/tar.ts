@@ -82,7 +82,11 @@ export function readTar(buffer: Uint8Array, options: TarReadOptions = {}): TarEn
     if (!name) continue;
 
     const type: TarEntry['type'] =
-      typeFlag === '5' || name.endsWith('/') ? 'directory' : typeFlag === '0' || typeFlag === '\0' ? 'file' : 'other';
+      typeFlag === '5' || name.endsWith('/')
+        ? 'directory'
+        : typeFlag === '0' || typeFlag === '\0'
+          ? 'file'
+          : 'other';
 
     if (type !== 'file') continue;
     if (size > maxEntryBytes) continue;

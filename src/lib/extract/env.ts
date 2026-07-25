@@ -77,7 +77,9 @@ function parseDeclarations(file: SourceFile): Declaration[] {
   }
 
   if (/^dockerfile/i.test(base)) {
-    for (const match of file.content.matchAll(/^\s*(?:ENV|ARG)\s+([A-Za-z_][A-Za-z0-9_]*)(?:[=\s](.*))?$/gim)) {
+    for (const match of file.content.matchAll(
+      /^\s*(?:ENV|ARG)\s+([A-Za-z_][A-Za-z0-9_]*)(?:[=\s](.*))?$/gim,
+    )) {
       declarations.push({
         name: match[1],
         file: file.path,

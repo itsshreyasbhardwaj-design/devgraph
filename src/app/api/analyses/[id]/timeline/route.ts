@@ -3,7 +3,13 @@ import { serverEnv } from '@/lib/config/env';
 import { buildGitHubTimeline } from '@/lib/git/timeline';
 import { parseRepoInput } from '@/lib/ingest/github';
 import { getAnalysisStore } from '@/lib/storage';
-import { apiError, guard, handleGuardError, NO_STORE_HEADERS, toApiError } from '@/lib/security/api';
+import {
+  apiError,
+  guard,
+  handleGuardError,
+  NO_STORE_HEADERS,
+  toApiError,
+} from '@/lib/security/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -14,7 +20,10 @@ export const maxDuration = 120;
  * call per sampled commit, and a rate-limited or history-less repository should
  * never delay the main result.
  */
-export async function GET(request: Request, context: { params: Promise<{ id: string }> }): Promise<Response> {
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ id: string }> },
+): Promise<Response> {
   try {
     const { userId, headers } = await guard(request, { bucket: 'timeline', limit: 10 });
     const { id } = await context.params;

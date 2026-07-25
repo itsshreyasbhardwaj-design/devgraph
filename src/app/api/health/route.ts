@@ -15,7 +15,10 @@ export async function GET(): Promise<Response> {
       status: 'ok',
       analysisVersion: ANALYSIS_VERSION,
       storage: store.kind,
-      languages: parsers.list().map((parser) => parser.id).sort(),
+      languages: parsers
+        .list()
+        .map((parser) => parser.id)
+        .sort(),
       features: publicFlags(),
       timestamp: new Date().toISOString(),
     },

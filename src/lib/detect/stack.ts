@@ -191,28 +191,88 @@ function languageDisplayName(language: LanguageId): string {
 // Entry points
 // ---------------------------------------------------------------------------
 
-const ENTRY_PATTERNS: { pattern: RegExp; kind: 'app' | 'server' | 'cli' | 'worker' | 'page' | 'build' | 'test'; reason: string; confidence: number }[] = [
-  { pattern: /^src\/(app|main|index)\.[cm]?[jt]sx?$/, kind: 'app', reason: 'Conventional application entry file', confidence: 0.9 },
-  { pattern: /^(app|main|index|server)\.[cm]?[jt]sx?$/, kind: 'server', reason: 'Root server entry file', confidence: 0.85 },
-  { pattern: /^src\/app\/layout\.[jt]sx$/, kind: 'app', reason: 'Next.js App Router root layout', confidence: 0.95 },
-  { pattern: /^app\/layout\.[jt]sx$/, kind: 'app', reason: 'Next.js App Router root layout', confidence: 0.95 },
-  { pattern: /^(src\/)?pages\/_app\.[jt]sx$/, kind: 'app', reason: 'Next.js Pages Router entry', confidence: 0.95 },
-  { pattern: /^(src\/)?app\/page\.[jt]sx$/, kind: 'page', reason: 'Next.js root page', confidence: 0.8 },
+const ENTRY_PATTERNS: {
+  pattern: RegExp;
+  kind: 'app' | 'server' | 'cli' | 'worker' | 'page' | 'build' | 'test';
+  reason: string;
+  confidence: number;
+}[] = [
+  {
+    pattern: /^src\/(app|main|index)\.[cm]?[jt]sx?$/,
+    kind: 'app',
+    reason: 'Conventional application entry file',
+    confidence: 0.9,
+  },
+  {
+    pattern: /^(app|main|index|server)\.[cm]?[jt]sx?$/,
+    kind: 'server',
+    reason: 'Root server entry file',
+    confidence: 0.85,
+  },
+  {
+    pattern: /^src\/app\/layout\.[jt]sx$/,
+    kind: 'app',
+    reason: 'Next.js App Router root layout',
+    confidence: 0.95,
+  },
+  {
+    pattern: /^app\/layout\.[jt]sx$/,
+    kind: 'app',
+    reason: 'Next.js App Router root layout',
+    confidence: 0.95,
+  },
+  {
+    pattern: /^(src\/)?pages\/_app\.[jt]sx$/,
+    kind: 'app',
+    reason: 'Next.js Pages Router entry',
+    confidence: 0.95,
+  },
+  {
+    pattern: /^(src\/)?app\/page\.[jt]sx$/,
+    kind: 'page',
+    reason: 'Next.js root page',
+    confidence: 0.8,
+  },
   { pattern: /^main\.go$/, kind: 'server', reason: 'Go program entry', confidence: 0.95 },
   { pattern: /^cmd\/[^/]+\/main\.go$/, kind: 'cli', reason: 'Go command entry', confidence: 0.95 },
   { pattern: /^src\/main\.rs$/, kind: 'cli', reason: 'Rust binary crate root', confidence: 0.95 },
   { pattern: /^src\/lib\.rs$/, kind: 'app', reason: 'Rust library crate root', confidence: 0.9 },
   { pattern: /^manage\.py$/, kind: 'cli', reason: 'Django management entry', confidence: 0.95 },
   { pattern: /^(src\/)?main\.py$/, kind: 'app', reason: 'Python program entry', confidence: 0.85 },
-  { pattern: /^(app|wsgi|asgi)\.py$/, kind: 'server', reason: 'WSGI/ASGI application entry', confidence: 0.9 },
+  {
+    pattern: /^(app|wsgi|asgi)\.py$/,
+    kind: 'server',
+    reason: 'WSGI/ASGI application entry',
+    confidence: 0.9,
+  },
   { pattern: /__main__\.py$/, kind: 'cli', reason: 'Python module entry', confidence: 0.85 },
-  { pattern: /Application\.java$/, kind: 'server', reason: 'Spring Boot application class', confidence: 0.9 },
+  {
+    pattern: /Application\.java$/,
+    kind: 'server',
+    reason: 'Spring Boot application class',
+    confidence: 0.9,
+  },
   { pattern: /^.*\/Program\.cs$/, kind: 'server', reason: '.NET program entry', confidence: 0.9 },
   { pattern: /^Program\.cs$/, kind: 'server', reason: '.NET program entry', confidence: 0.9 },
-  { pattern: /^public\/index\.php$/, kind: 'server', reason: 'PHP front controller', confidence: 0.9 },
+  {
+    pattern: /^public\/index\.php$/,
+    kind: 'server',
+    reason: 'PHP front controller',
+    confidence: 0.9,
+  },
   { pattern: /^artisan$/, kind: 'cli', reason: 'Laravel console entry', confidence: 0.9 },
-  { pattern: /^(src\/)?worker\.[jt]s$/, kind: 'worker', reason: 'Background worker entry', confidence: 0.8 },
-  { pattern: /^(src\/)?middleware\.[jt]s$/, kind: 'server', reason: 'Edge middleware entry', confidence: 0.85 },
+  {
+    pattern: /^(src\/)?worker\.[jt]s$/,
+    kind: 'worker',
+    reason: 'Background worker entry',
+    confidence: 0.8,
+  },
+  {
+    pattern: /^(src\/)?middleware\.[jt]s$/,
+    kind: 'server',
+    reason: 'Edge middleware entry',
+    confidence: 0.85,
+  },
 ];
 
 export interface EntryPointResult {

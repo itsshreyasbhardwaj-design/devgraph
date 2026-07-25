@@ -23,7 +23,10 @@ export function isCoverageFile(path: string): boolean {
   return COVERAGE_FILE_PATTERNS.some((pattern) => pattern.test(path));
 }
 
-export function parseCoverage(files: SourceFile[], repoPaths: Set<string>): CoverageReport | undefined {
+export function parseCoverage(
+  files: SourceFile[],
+  repoPaths: Set<string>,
+): CoverageReport | undefined {
   for (const file of files) {
     if (!isCoverageFile(file.path)) continue;
     try {
@@ -113,7 +116,9 @@ function parseIstanbul(content: string): RawEntry[] {
 
 function parseCobertura(content: string): RawEntry[] {
   const entries: RawEntry[] = [];
-  for (const match of content.matchAll(/<class\b[^>]*filename="([^"]+)"[^>]*>([\s\S]*?)<\/class>/g)) {
+  for (const match of content.matchAll(
+    /<class\b[^>]*filename="([^"]+)"[^>]*>([\s\S]*?)<\/class>/g,
+  )) {
     const lines = [...match[2].matchAll(/<line\b[^>]*hits="(\d+)"/g)];
     if (!lines.length) continue;
     entries.push({
@@ -145,10 +150,7 @@ function parseGoProfile(content: string): RawEntry[] {
  * Coverage tools emit absolute or tool-relative paths. Match each entry to a
  * repo file by longest common suffix so `/builds/ci/src/a.ts` finds `src/a.ts`.
  */
-function remapPaths(
-  entries: RawEntry[],
-  repoPaths: Set<string>,
-): CoverageReport['files'] {
+function remapPaths(entries: RawEntry[], repoPaths: Set<string>): CoverageReport['files'] {
   const bySuffix = new Map<string, string[]>();
   for (const path of repoPaths) {
     const segments = path.split('/');

@@ -48,7 +48,9 @@ describe('scanSource', () => {
   });
 
   it('counts code, comment and blank lines', () => {
-    const source = ['const a = 1;', '', '// note', '/* block', '   more */', 'const b = 2;'].join('\n');
+    const source = ['const a = 1;', '', '// note', '/* block', '   more */', 'const b = 2;'].join(
+      '\n',
+    );
     const scan = scanSource(source, ts);
     expect(scan.lines.total).toBe(6);
     expect(scan.lines.code).toBe(2);
@@ -79,7 +81,7 @@ describe('scanSource', () => {
   });
 
   it('handles php heredocs', () => {
-    const source = "<?php\n$sql = <<<SQL\nSELECT * FROM users;\nSQL;\n$x = 1;\n";
+    const source = '<?php\n$sql = <<<SQL\nSELECT * FROM users;\nSQL;\n$x = 1;\n';
     const scan = scanSource(source, SYNTAX_PROFILES.php);
     expect(scan.code).toContain('$x = 1;');
     expect(scan.code).not.toContain('SELECT * FROM users');

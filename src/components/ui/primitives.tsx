@@ -43,8 +43,7 @@ const badgeVariants = cva(
 );
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof badgeVariants> {}
+  extends React.HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {}
 
 export function Badge({ className, tone, ...props }: BadgeProps) {
   return <span className={cn(badgeVariants({ tone }), className)} {...props} />;
@@ -54,38 +53,32 @@ export function Badge({ className, tone, ...props }: BadgeProps) {
 // Input
 // ---------------------------------------------------------------------------
 
-export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
-  function Input({ className, ...props }, ref) {
-    return (
-      <input
-        ref={ref}
-        className={cn(
-          'h-9 w-full rounded-md border border-line bg-pit px-3 text-sm text-ink transition-colors',
-          'placeholder:text-ink-ghost hover:border-line-strong',
-          'focus:border-edge/60 focus:outline-none focus:ring-2 focus:ring-edge/25',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-          className,
-        )}
-        {...props}
-      />
-    );
-  },
-);
+export const Input = React.forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement>
+>(function Input({ className, ...props }, ref) {
+  return (
+    <input
+      ref={ref}
+      className={cn(
+        'border-line bg-pit text-ink h-9 w-full rounded-md border px-3 text-sm transition-colors',
+        'placeholder:text-ink-ghost hover:border-line-strong',
+        'focus:border-edge/60 focus:ring-edge/25 focus:ring-2 focus:outline-none',
+        'disabled:cursor-not-allowed disabled:opacity-50',
+        className,
+      )}
+      {...props}
+    />
+  );
+});
 
 // ---------------------------------------------------------------------------
 // Panel — the standard bordered surface
 // ---------------------------------------------------------------------------
 
-export function Panel({
-  className,
-  children,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+export function Panel({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      className={cn('rounded-lg border border-line bg-surface/70', className)}
-      {...props}
-    >
+    <div className={cn('border-line bg-surface/70 rounded-lg border', className)} {...props}>
       {children}
     </div>
   );
@@ -105,13 +98,13 @@ export function PanelHeader({
   return (
     <div
       className={cn(
-        'flex items-center justify-between gap-3 border-b border-line px-4 py-2.5',
+        'border-line flex items-center justify-between gap-3 border-b px-4 py-2.5',
         className,
       )}
     >
       <div className="min-w-0">
-        <h3 className="truncate text-[13px] font-medium text-ink">{title}</h3>
-        {detail ? <p className="mt-0.5 truncate text-[11px] text-ink-faint">{detail}</p> : null}
+        <h3 className="text-ink truncate text-[13px] font-medium">{title}</h3>
+        {detail ? <p className="text-ink-faint mt-0.5 truncate text-[11px]">{detail}</p> : null}
       </div>
       {action}
     </div>
@@ -123,7 +116,7 @@ export function Eyebrow({ className, ...props }: React.HTMLAttributes<HTMLDivEle
   return (
     <div
       className={cn(
-        'text-[10px] font-semibold uppercase tracking-[0.16em] text-ink-ghost',
+        'text-ink-ghost text-[10px] font-semibold tracking-[0.16em] uppercase',
         className,
       )}
       {...props}
@@ -144,7 +137,7 @@ export function Separator({
     <SeparatorPrimitive.Root
       orientation={orientation}
       className={cn(
-        'shrink-0 bg-line',
+        'bg-line shrink-0',
         orientation === 'horizontal' ? 'h-px w-full' : 'h-full w-px',
         className,
       )}
@@ -162,7 +155,7 @@ export const Tabs = TabsPrimitive.Root;
 export function TabsList({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.List>) {
   return (
     <TabsPrimitive.List
-      className={cn('flex items-center gap-0.5 rounded-md bg-pit p-0.5', className)}
+      className={cn('bg-pit flex items-center gap-0.5 rounded-md p-0.5', className)}
       {...props}
     />
   );
@@ -175,7 +168,7 @@ export function TabsTrigger({
   return (
     <TabsPrimitive.Trigger
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-[13px] font-medium text-ink-faint transition-colors',
+        'text-ink-faint inline-flex items-center gap-1.5 rounded-sm px-3 py-1.5 text-[13px] font-medium transition-colors',
         'hover:text-ink-muted',
         'data-[state=active]:bg-raised data-[state=active]:text-ink data-[state=active]:shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset]',
         className,
@@ -190,10 +183,7 @@ export function TabsContent({
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Content>) {
   return (
-    <TabsPrimitive.Content
-      className={cn('focus-visible:outline-none', className)}
-      {...props}
-    />
+    <TabsPrimitive.Content className={cn('focus-visible:outline-none', className)} {...props} />
   );
 }
 
@@ -223,7 +213,7 @@ export function Tooltip({
           side={side}
           sideOffset={6}
           className={cn(
-            'z-100 max-w-xs rounded-sm border border-line bg-raised px-2.5 py-1.5 text-[12px] leading-relaxed text-ink-muted shadow-xl',
+            'border-line bg-raised text-ink-muted z-100 max-w-xs rounded-sm border px-2.5 py-1.5 text-[12px] leading-relaxed shadow-xl',
             'animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
           )}
         >
@@ -252,14 +242,14 @@ export function DialogContent({
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay
         className={cn(
-          'fixed inset-0 z-100 bg-void/80 backdrop-blur-sm',
+          'bg-void/80 fixed inset-0 z-100 backdrop-blur-sm',
           'data-[state=open]:animate-in data-[state=open]:fade-in-0',
           'data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
         )}
       />
       <DialogPrimitive.Content
         className={cn(
-          'glass fixed left-1/2 top-1/2 z-100 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl p-6',
+          'glass fixed top-1/2 left-1/2 z-100 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-xl p-6',
           'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
           'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
           className,
@@ -269,7 +259,7 @@ export function DialogContent({
         {children}
         {showClose ? (
           <DialogPrimitive.Close
-            className="absolute right-4 top-4 rounded-xs p-1 text-ink-faint transition-colors hover:bg-hover hover:text-ink"
+            className="text-ink-faint hover:bg-hover hover:text-ink absolute top-4 right-4 rounded-xs p-1 transition-colors"
             aria-label="Close"
           >
             <X className="size-4" />
@@ -286,7 +276,7 @@ export function DialogTitle({
 }: React.ComponentProps<typeof DialogPrimitive.Title>) {
   return (
     <DialogPrimitive.Title
-      className={cn('font-display text-lg font-semibold text-ink', className)}
+      className={cn('font-display text-ink text-lg font-semibold', className)}
       {...props}
     />
   );
@@ -298,7 +288,7 @@ export function DialogDescription({
 }: React.ComponentProps<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
-      className={cn('mt-1 text-sm text-ink-muted', className)}
+      className={cn('text-ink-muted mt-1 text-sm', className)}
       {...props}
     />
   );
@@ -321,9 +311,9 @@ export function ScrollArea({
       </ScrollAreaPrimitive.Viewport>
       <ScrollAreaPrimitive.Scrollbar
         orientation="vertical"
-        className="flex w-2 touch-none select-none p-0.5 transition-opacity"
+        className="flex w-2 touch-none p-0.5 transition-opacity select-none"
       >
-        <ScrollAreaPrimitive.Thumb className="flex-1 rounded-full bg-line-strong hover:bg-ink-ghost" />
+        <ScrollAreaPrimitive.Thumb className="bg-line-strong hover:bg-ink-ghost flex-1 rounded-full" />
       </ScrollAreaPrimitive.Scrollbar>
       <ScrollAreaPrimitive.Corner />
     </ScrollAreaPrimitive.Root>
@@ -353,7 +343,7 @@ export function Progress({
   return (
     <ProgressPrimitive.Root
       value={value}
-      className={cn('relative h-1 w-full overflow-hidden rounded-full bg-line', className)}
+      className={cn('bg-line relative h-1 w-full overflow-hidden rounded-full', className)}
     >
       <ProgressPrimitive.Indicator
         className={cn('h-full transition-transform duration-500 ease-out', colors[tone])}
@@ -371,7 +361,7 @@ export function Switch({ className, ...props }: React.ComponentProps<typeof Swit
   return (
     <SwitchPrimitive.Root
       className={cn(
-        'peer inline-flex h-[18px] w-8 shrink-0 cursor-pointer items-center rounded-full border border-line transition-colors',
+        'peer border-line inline-flex h-[18px] w-8 shrink-0 cursor-pointer items-center rounded-full border transition-colors',
         'data-[state=checked]:border-edge/60 data-[state=checked]:bg-edge/30 data-[state=unchecked]:bg-pit',
         className,
       )}
@@ -379,8 +369,8 @@ export function Switch({ className, ...props }: React.ComponentProps<typeof Swit
     >
       <SwitchPrimitive.Thumb
         className={cn(
-          'pointer-events-none block size-3 rounded-full bg-ink-faint shadow transition-transform',
-          'data-[state=checked]:translate-x-[15px] data-[state=checked]:bg-edge-soft data-[state=unchecked]:translate-x-[2px]',
+          'bg-ink-faint pointer-events-none block size-3 rounded-full shadow transition-transform',
+          'data-[state=checked]:bg-edge-soft data-[state=checked]:translate-x-[15px] data-[state=unchecked]:translate-x-[2px]',
         )}
       />
     </SwitchPrimitive.Root>
@@ -415,10 +405,10 @@ export function Stat({
   return (
     <div className={cn('min-w-0', className)}>
       <Eyebrow>{label}</Eyebrow>
-      <div className={cn('tabular mt-1.5 text-[22px] font-medium leading-none', toneClass)}>
+      <div className={cn('tabular mt-1.5 text-[22px] leading-none font-medium', toneClass)}>
         {value}
       </div>
-      {detail ? <div className="mt-1.5 truncate text-[11px] text-ink-faint">{detail}</div> : null}
+      {detail ? <div className="text-ink-faint mt-1.5 truncate text-[11px]">{detail}</div> : null}
     </div>
   );
 }
@@ -448,14 +438,14 @@ export function EmptyState({
       )}
     >
       {icon ? (
-        <div className="flex size-10 items-center justify-center rounded-md border border-line bg-raised text-ink-faint">
+        <div className="border-line bg-raised text-ink-faint flex size-10 items-center justify-center rounded-md border">
           {icon}
         </div>
       ) : null}
       <div>
-        <p className="text-sm font-medium text-ink">{title}</p>
+        <p className="text-ink text-sm font-medium">{title}</p>
         {description ? (
-          <p className="mx-auto mt-1.5 max-w-sm text-[13px] leading-relaxed text-ink-faint">
+          <p className="text-ink-faint mx-auto mt-1.5 max-w-sm text-[13px] leading-relaxed">
             {description}
           </p>
         ) : null}

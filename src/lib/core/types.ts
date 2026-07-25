@@ -521,16 +521,7 @@ export interface DebtSignal {
 // ---------------------------------------------------------------------------
 
 export type HttpMethod =
-  | 'GET'
-  | 'POST'
-  | 'PUT'
-  | 'PATCH'
-  | 'DELETE'
-  | 'HEAD'
-  | 'OPTIONS'
-  | 'ALL'
-  | 'WS'
-  | 'RPC';
+  'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'ALL' | 'WS' | 'RPC';
 
 export interface ApiRoute {
   id: string;

@@ -238,7 +238,12 @@ export function scanSource(source: string, profile: SyntaxProfile): ScanResult {
    * Read a quoted string. Delimiters are preserved in the mask so parsers can
    * still see `from " "`; the body is blanked and recorded.
    */
-  const readQuoted = (quote: string, escapes: boolean, kind: LiteralKind, allowNewline: boolean) => {
+  const readQuoted = (
+    quote: string,
+    escapes: boolean,
+    kind: LiteralKind,
+    allowNewline: boolean,
+  ) => {
     const start = i;
     const startLine = line;
     for (let k = 0; k < quote.length; k += 1) emit(source[i]);
@@ -474,7 +479,8 @@ export function scanSource(source: string, profile: SyntaxProfile): ScanResult {
 
     // JS regex literals.
     if (profile.regexLiterals && ch === '/') {
-      const isRegex = REGEX_PRECEDING.has(lastSignificant) || REGEX_PRECEDING_KEYWORDS.has(lastWord);
+      const isRegex =
+        REGEX_PRECEDING.has(lastSignificant) || REGEX_PRECEDING_KEYWORDS.has(lastWord);
       if (isRegex) {
         readRegex();
         lastSignificant = '/';
@@ -548,7 +554,11 @@ export function lineAt(scan: ScanResult, offset: number): number {
  * bounded by `limit` so a failed match cannot grab a literal from the next
  * statement.
  */
-export function literalAfter(scan: ScanResult, offset: number, limit = 400): StringLiteral | undefined {
+export function literalAfter(
+  scan: ScanResult,
+  offset: number,
+  limit = 400,
+): StringLiteral | undefined {
   for (const literal of scan.literals) {
     if (literal.start < offset) continue;
     if (literal.start > offset + limit) return undefined;

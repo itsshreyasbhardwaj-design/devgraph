@@ -161,7 +161,8 @@ export const useWorkspace = create<WorkspaceState>((set, get) => ({
 
   setTab: (tab) => set({ tab }),
   setGraph: (graph) => set({ graph, filters: { ...get().filters, focusId: null } }),
-  select: (selectedId) => set({ selectedId, inspectorOpen: selectedId ? true : get().inspectorOpen }),
+  select: (selectedId) =>
+    set({ selectedId, inspectorOpen: selectedId ? true : get().inspectorOpen }),
 
   toggleCollapsed(id) {
     const collapsed = new Set(get().collapsed);
@@ -306,7 +307,11 @@ export function visibleGraph(
     const key = `${source}->${target}:${edge.kind}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    visibleEdges.push(source === edge.source && target === edge.target ? edge : { ...edge, id: key, source, target });
+    visibleEdges.push(
+      source === edge.source && target === edge.target
+        ? edge
+        : { ...edge, id: key, source, target },
+    );
   }
 
   return {
@@ -322,8 +327,12 @@ export function visibleGraph(
 export function neighbours(startId: string, edges: GraphEdge[], depth: number): Set<string> {
   const adjacency = new Map<string, string[]>();
   for (const edge of edges) {
-    (adjacency.get(edge.source) ?? adjacency.set(edge.source, []).get(edge.source)!).push(edge.target);
-    (adjacency.get(edge.target) ?? adjacency.set(edge.target, []).get(edge.target)!).push(edge.source);
+    (adjacency.get(edge.source) ?? adjacency.set(edge.source, []).get(edge.source)!).push(
+      edge.target,
+    );
+    (adjacency.get(edge.target) ?? adjacency.set(edge.target, []).get(edge.target)!).push(
+      edge.source,
+    );
   }
 
   const reached = new Set([startId]);

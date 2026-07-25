@@ -25,14 +25,26 @@ export const dynamic = 'force-dynamic';
 const VIEWS = [
   { icon: FolderTree, name: 'Folder hierarchy', line: 'The tree, sized by the code inside it.' },
   { icon: Network, name: 'Import graph', line: 'Every file and what it pulls in.' },
-  { icon: Boxes, name: 'Module dependencies', line: 'Directory-level shape, plus external packages.' },
+  {
+    icon: Boxes,
+    name: 'Module dependencies',
+    line: 'Directory-level shape, plus external packages.',
+  },
   { icon: Shapes, name: 'Class diagram', line: 'Types, members, inheritance, interfaces.' },
   { icon: PhoneCall, name: 'Call graph', line: 'Which function reaches which.' },
-  { icon: Waypoints, name: 'Component hierarchy', line: 'What renders what, and how deep it goes.' },
+  {
+    icon: Waypoints,
+    name: 'Component hierarchy',
+    line: 'What renders what, and how deep it goes.',
+  },
   { icon: GitBranch, name: 'Circular dependencies', line: 'The cycles nobody meant to create.' },
   { icon: Route, name: 'API routes', line: 'Every endpoint, its method and its handler.' },
   { icon: Database, name: 'Database schema', line: 'Tables, columns, foreign keys.' },
-  { icon: KeyRound, name: 'Environment config', line: 'Which variables are read where — and which leak.' },
+  {
+    icon: KeyRound,
+    name: 'Environment config',
+    line: 'Which variables are read where — and which leak.',
+  },
 ];
 
 const LANGUAGES = [
@@ -77,11 +89,11 @@ export default function LandingPage() {
         className="pointer-events-none fixed inset-x-0 top-0 h-[560px] bg-[radial-gradient(ellipse_70%_60%_at_50%_-10%,rgba(124,92,255,0.16),transparent)]"
       />
 
-      <header className="relative z-10 border-b border-line/70">
+      <header className="border-line/70 relative z-10 border-b">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-5">
           <Link href="/" className="flex items-center gap-2.5">
             <Mark />
-            <span className="font-display text-[15px] font-semibold tracking-tight text-ink">
+            <span className="font-display text-ink text-[15px] font-semibold tracking-tight">
               DevGraph
             </span>
           </Link>
@@ -113,12 +125,12 @@ export default function LandingPage() {
               <Badge tone="accent" className="mb-6">
                 Open source · MIT
               </Badge>
-              <h1 className="font-display text-[clamp(2.4rem,6.2vw,4.1rem)] font-semibold leading-[0.98] text-ink">
+              <h1 className="font-display text-ink text-[clamp(2.4rem,6.2vw,4.1rem)] leading-[0.98] font-semibold">
                 Every codebase is a graph
                 <br />
                 <span className="text-ink-faint">you can&rsquo;t see.</span>
               </h1>
-              <p className="mt-6 max-w-lg text-[15px] leading-relaxed text-ink-muted">
+              <p className="text-ink-muted mt-6 max-w-lg text-[15px] leading-relaxed">
                 DevGraph reads a repository and draws it — imports, calls, classes, components, API
                 routes, database schema, and the dependency cycles nobody meant to create. Eight
                 languages, no setup, nothing to install.
@@ -136,10 +148,10 @@ export default function LandingPage() {
                 ].map(([value, label]) => (
                   <div key={label}>
                     <dt className="sr-only">{label}</dt>
-                    <dd className="tabular text-[26px] font-medium leading-none text-ink">
+                    <dd className="tabular text-ink text-[26px] leading-none font-medium">
                       {value}
                     </dd>
-                    <dd className="mt-1.5 text-[11px] uppercase tracking-[0.13em] text-ink-ghost">
+                    <dd className="text-ink-ghost mt-1.5 text-[11px] tracking-[0.13em] uppercase">
                       {label}
                     </dd>
                   </div>
@@ -150,19 +162,19 @@ export default function LandingPage() {
             {/* The signature: a real graph, drawn the way the product draws it. */}
             <div className="relative">
               <div className="glass rounded-xl p-1">
-                <div className="grid-field overflow-hidden rounded-lg bg-void/60">
-                  <div className="flex items-center justify-between border-b border-line/60 px-3 py-2">
-                    <span className="tabular text-[11px] text-ink-ghost">
+                <div className="grid-field bg-void/60 overflow-hidden rounded-lg">
+                  <div className="border-line/60 flex items-center justify-between border-b px-3 py-2">
+                    <span className="tabular text-ink-ghost text-[11px]">
                       acme-shop · import graph
                     </span>
-                    <span className="flex items-center gap-1.5 text-[10.5px] text-ink-ghost">
-                      <span className="size-1.5 rounded-full bg-cycle" />1 cycle
+                    <span className="text-ink-ghost flex items-center gap-1.5 text-[10.5px]">
+                      <span className="bg-cycle size-1.5 rounded-full" />1 cycle
                     </span>
                   </div>
                   <HeroGraph className="h-auto w-full" />
                 </div>
               </div>
-              <p className="mt-3 text-center text-[11px] text-ink-ghost">
+              <p className="text-ink-ghost mt-3 text-center text-[11px]">
                 Hover a node to isolate its neighbourhood — the same interaction as the workspace.
               </p>
             </div>
@@ -170,27 +182,27 @@ export default function LandingPage() {
         </section>
 
         {/* --------------------------------------------------------- views */}
-        <section id="views" className="border-y border-line/70 bg-pit/40">
+        <section id="views" className="border-line/70 bg-pit/40 border-y">
           <div className="mx-auto max-w-6xl px-5 py-20">
             <Eyebrow>Ten views of one repository</Eyebrow>
-            <h2 className="mt-3 max-w-2xl font-display text-[clamp(1.6rem,3.4vw,2.3rem)] font-semibold leading-tight text-ink">
+            <h2 className="font-display text-ink mt-3 max-w-2xl text-[clamp(1.6rem,3.4vw,2.3rem)] leading-tight font-semibold">
               One analysis, ten ways to look at it.
             </h2>
-            <p className="mt-3 max-w-xl text-[14px] leading-relaxed text-ink-muted">
-              Each view answers a different question. Switching between them keeps your selection, so
-              you can follow one file from the folder tree into the call graph without losing it.
+            <p className="text-ink-muted mt-3 max-w-xl text-[14px] leading-relaxed">
+              Each view answers a different question. Switching between them keeps your selection,
+              so you can follow one file from the folder tree into the call graph without losing it.
             </p>
 
-            <ul className="mt-10 grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="border-line bg-line mt-10 grid gap-px overflow-hidden rounded-lg border sm:grid-cols-2 lg:grid-cols-3">
               {VIEWS.map(({ icon: Icon, name, line }) => (
                 <li
                   key={name}
-                  className="group flex gap-3 bg-surface px-5 py-5 transition-colors hover:bg-raised"
+                  className="group bg-surface hover:bg-raised flex gap-3 px-5 py-5 transition-colors"
                 >
-                  <Icon className="mt-0.5 size-4 shrink-0 text-ink-ghost transition-colors group-hover:text-edge" />
+                  <Icon className="text-ink-ghost group-hover:text-edge mt-0.5 size-4 shrink-0 transition-colors" />
                   <div className="min-w-0">
-                    <h3 className="text-[13.5px] font-medium text-ink">{name}</h3>
-                    <p className="mt-1 text-[12.5px] leading-relaxed text-ink-faint">{line}</p>
+                    <h3 className="text-ink text-[13.5px] font-medium">{name}</h3>
+                    <p className="text-ink-faint mt-1 text-[12.5px] leading-relaxed">{line}</p>
                   </div>
                 </li>
               ))}
@@ -203,10 +215,10 @@ export default function LandingPage() {
           <div className="grid gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
             <div>
               <Eyebrow>What it reads</Eyebrow>
-              <h2 className="mt-3 font-display text-[clamp(1.6rem,3.4vw,2.3rem)] font-semibold leading-tight text-ink">
+              <h2 className="font-display text-ink mt-3 text-[clamp(1.6rem,3.4vw,2.3rem)] leading-tight font-semibold">
                 Eight languages, one model.
               </h2>
-              <p className="mt-3 max-w-md text-[14px] leading-relaxed text-ink-muted">
+              <p className="text-ink-muted mt-3 max-w-md text-[14px] leading-relaxed">
                 Every parser produces the same structural record — imports, exports, symbols, calls,
                 configuration — so a polyglot repository draws as one graph instead of several.
               </p>
@@ -215,26 +227,26 @@ export default function LandingPage() {
                 {LANGUAGES.map((language) => (
                   <li
                     key={language.id}
-                    className="flex items-center gap-2 rounded-sm border border-line bg-raised px-2.5 py-1.5"
+                    className="border-line bg-raised flex items-center gap-2 rounded-sm border px-2.5 py-1.5"
                   >
                     <span
                       className="size-2 rounded-[2px]"
                       style={{ backgroundColor: LANGUAGE_COLORS[language.id] }}
                     />
-                    <span className="text-[12.5px] text-ink-muted">{language.label}</span>
+                    <span className="text-ink-muted text-[12.5px]">{language.label}</span>
                   </li>
                 ))}
               </ul>
-              <p className="mt-4 text-[12px] text-ink-ghost">
+              <p className="text-ink-ghost mt-4 text-[12px]">
                 Adding a language is one file plus one registry line.
               </p>
             </div>
 
-            <ul className="grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2">
+            <ul className="border-line bg-line grid gap-px overflow-hidden rounded-lg border sm:grid-cols-2">
               {READS.map((item) => (
                 <li key={item.title} className="bg-surface p-5">
-                  <h3 className="text-[13.5px] font-medium text-ink">{item.title}</h3>
-                  <p className="mt-2 text-[12.5px] leading-relaxed text-ink-faint">{item.body}</p>
+                  <h3 className="text-ink text-[13.5px] font-medium">{item.title}</h3>
+                  <p className="text-ink-faint mt-2 text-[12.5px] leading-relaxed">{item.body}</p>
                 </li>
               ))}
             </ul>
@@ -242,10 +254,10 @@ export default function LandingPage() {
         </section>
 
         {/* ------------------------------------------------------------ how */}
-        <section id="how" className="border-t border-line/70 bg-pit/40">
+        <section id="how" className="border-line/70 bg-pit/40 border-t">
           <div className="mx-auto max-w-6xl px-5 py-20">
             <Eyebrow>How it works</Eyebrow>
-            <h2 className="mt-3 font-display text-[clamp(1.6rem,3.4vw,2.3rem)] font-semibold leading-tight text-ink">
+            <h2 className="font-display text-ink mt-3 text-[clamp(1.6rem,3.4vw,2.3rem)] leading-tight font-semibold">
               Nothing is cloned, executed, or kept.
             </h2>
 
@@ -264,27 +276,28 @@ export default function LandingPage() {
                   body: 'The result is yours to zoom, filter, search and export as SVG, PNG, PDF, JSON or Mermaid. Without a database configured, it lives only in the running process.',
                 },
               ].map((item, index) => (
-                <li key={item.step} className="relative border-t border-line pt-5">
+                <li key={item.step} className="border-line relative border-t pt-5">
                   {/* The number is real sequence information, so it earns its place. */}
-                  <span className="tabular absolute -top-px left-0 h-px w-8 bg-edge" aria-hidden />
+                  <span className="tabular bg-edge absolute -top-px left-0 h-px w-8" aria-hidden />
                   <div className="flex items-baseline gap-2.5">
-                    <span className="tabular text-[11px] text-edge">
+                    <span className="tabular text-edge text-[11px]">
                       {String(index + 1).padStart(2, '0')}
                     </span>
-                    <h3 className="text-[14px] font-medium text-ink">{item.step}</h3>
+                    <h3 className="text-ink text-[14px] font-medium">{item.step}</h3>
                   </div>
-                  <p className="mt-2.5 text-[13px] leading-relaxed text-ink-faint">{item.body}</p>
+                  <p className="text-ink-faint mt-2.5 text-[13px] leading-relaxed">{item.body}</p>
                 </li>
               ))}
             </ol>
 
-            <div className="mt-12 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-surface/60 px-5 py-4">
-              <Braces className="size-4 text-ink-ghost" />
-              <p className="flex-1 text-[13px] text-ink-muted">
+            <div className="border-line bg-surface/60 mt-12 flex flex-wrap items-center gap-3 rounded-lg border px-5 py-4">
+              <Braces className="text-ink-ghost size-4" />
+              <p className="text-ink-muted flex-1 text-[13px]">
                 This instance runs{' '}
-                <span className="text-ink">{flags.persistence ? 'with' : 'without'}</span> a database,{' '}
-                <span className="text-ink">{flags.auth ? 'with' : 'without'}</span> accounts, and{' '}
-                <span className="text-ink">{flags.ai ? 'with' : 'without'}</span> AI insights.
+                <span className="text-ink">{flags.persistence ? 'with' : 'without'}</span> a
+                database, <span className="text-ink">{flags.auth ? 'with' : 'without'}</span>{' '}
+                accounts, and <span className="text-ink">{flags.ai ? 'with' : 'without'}</span> AI
+                insights.
                 {flags.ai ? null : ' Deterministic analysis covers every section regardless.'}
               </p>
               <Button variant="subtle" size="sm" asChild>
@@ -302,11 +315,11 @@ export default function LandingPage() {
 
         {/* ------------------------------------------------------------ cta */}
         <section className="mx-auto max-w-3xl px-5 py-24 text-center">
-          <GitCompare className="mx-auto size-5 text-ink-ghost" />
-          <h2 className="mt-5 font-display text-[clamp(1.7rem,4vw,2.6rem)] font-semibold leading-tight text-ink">
+          <GitCompare className="text-ink-ghost mx-auto size-5" />
+          <h2 className="font-display text-ink mt-5 text-[clamp(1.7rem,4vw,2.6rem)] leading-tight font-semibold">
             Point it at a repository you have never read.
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-[14px] leading-relaxed text-ink-muted">
+          <p className="text-ink-muted mx-auto mt-3 max-w-md text-[14px] leading-relaxed">
             The first graph usually arrives before you have finished reading the README.
           </p>
           <div className="mx-auto mt-8 max-w-xl text-left">
@@ -315,17 +328,17 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="relative z-10 border-t border-line/70">
+      <footer className="border-line/70 relative z-10 border-t">
         <div className="mx-auto flex max-w-6xl flex-col gap-4 px-5 py-8 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2.5">
             <Mark />
-            <span className="text-[13px] text-ink-faint">
+            <span className="text-ink-faint text-[13px]">
               DevGraph — MIT licensed, contributions welcome.
             </span>
           </div>
-          <div className="flex items-center gap-4 text-[12.5px] text-ink-faint">
+          <div className="text-ink-faint flex items-center gap-4 text-[12.5px]">
             <a
-              className="transition-colors hover:text-ink"
+              className="hover:text-ink transition-colors"
               href="https://github.com/itsshreyasbhardwaj-design/devgraph"
               target="_blank"
               rel="noreferrer noopener"
@@ -333,14 +346,14 @@ export default function LandingPage() {
               Source
             </a>
             <a
-              className="transition-colors hover:text-ink"
+              className="hover:text-ink transition-colors"
               href="https://github.com/itsshreyasbhardwaj-design/devgraph/blob/main/CONTRIBUTING.md"
               target="_blank"
               rel="noreferrer noopener"
             >
               Contributing
             </a>
-            <Link className="transition-colors hover:text-ink" href="/api/health">
+            <Link className="hover:text-ink transition-colors" href="/api/health">
               Status
             </Link>
           </div>

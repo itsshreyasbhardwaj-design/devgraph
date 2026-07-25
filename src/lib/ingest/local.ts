@@ -89,7 +89,10 @@ export async function ingestLocal(options: LocalIngestOptions): Promise<IngestRe
       } catch {
         continue;
       }
-      if (fileInfo.size > limits.maxFileBytes || totalBytes + fileInfo.size > limits.maxTotalBytes) {
+      if (
+        fileInfo.size > limits.maxFileBytes ||
+        totalBytes + fileInfo.size > limits.maxTotalBytes
+      ) {
         skipped += 1;
         continue;
       }
@@ -115,7 +118,11 @@ export async function ingestLocal(options: LocalIngestOptions): Promise<IngestRe
   await walk(target, 0);
 
   if (!files.length) {
-    throw new IngestError('No analysable source files were found in that directory.', 'unsupported', 422);
+    throw new IngestError(
+      'No analysable source files were found in that directory.',
+      'unsupported',
+      422,
+    );
   }
   if (skipped) warnings.push(`${skipped} file(s) were skipped (binary, oversized or unreadable).`);
 

@@ -1,7 +1,31 @@
 {
   "name": "devgraph",
   "version": "0.1.0",
+  "description": "AI-powered interactive software architecture visualization for any codebase",
   "private": true,
+  "license": "MIT",
+  "homepage": "https://github.com/itsshreyasbhardwaj-design/devgraph#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/itsshreyasbhardwaj-design/devgraph.git"
+  },
+  "bugs": {
+    "url": "https://github.com/itsshreyasbhardwaj-design/devgraph/issues"
+  },
+  "keywords": [
+    "code-visualization",
+    "software-architecture",
+    "dependency-graph",
+    "static-analysis",
+    "developer-tools",
+    "code-metrics",
+    "mermaid",
+    "react-flow"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@11.17.0",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,7 +33,14 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "test:coverage": "vitest run --coverage",
+    "fixtures": "node tests/e2e/fixtures/build-fixture.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint:fix": "eslint --fix",
+    "verify": "run-s lint typecheck test build"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.6.0",

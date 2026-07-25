@@ -1,0 +1,54 @@
+name: Feature request
+description: Suggest a capability DevGraph should have.
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of addition
+      options:
+        - A new language parser
+        - A new framework or stack detection rule
+        - A new route or schema extractor
+        - A new graph view
+        - A new metric
+        - An export format
+        - A UI or interaction improvement
+        - Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you unable to do today? Describe the situation, not the solution.
+      placeholder: |
+        Our backend is Ruby on Rails, so DevGraph shows the repository as a
+        folder tree with no import edges and no routes.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you would like
+      placeholder: |
+        A Ruby parser covering require/require_relative, class and module
+        declarations, and Rails routes from config/routes.rb.
+    validations:
+      required: true
+
+  - type: input
+    id: example
+    attributes:
+      label: An example repository
+      description: A public repository that would benefit. Makes the feature testable.
+      placeholder: owner/repo
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to work on this

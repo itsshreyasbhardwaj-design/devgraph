@@ -69,15 +69,15 @@ export function RepoInput({ className, autoFocus }: { className?: string; autoFo
           if (file) handleUpload(file);
         }}
         className={cn(
-          'group relative flex items-center gap-2 rounded-lg border bg-pit/90 p-1.5 transition-all duration-200',
+          'group bg-pit/90 relative flex items-center gap-2 rounded-lg border p-1.5 transition-all duration-200',
           dragging
-            ? 'border-edge bg-edge/10 ring-2 ring-edge/30'
-            : 'border-line hover:border-line-strong focus-within:border-edge/60 focus-within:ring-2 focus-within:ring-edge/20',
+            ? 'border-edge bg-edge/10 ring-edge/30 ring-2'
+            : 'border-line hover:border-line-strong focus-within:border-edge/60 focus-within:ring-edge/20 focus-within:ring-2',
         )}
       >
         <span
           aria-hidden
-          className="tabular hidden select-none pl-3 text-[13px] text-ink-ghost sm:block"
+          className="tabular text-ink-ghost hidden pl-3 text-[13px] select-none sm:block"
         >
           github.com/
         </span>
@@ -90,7 +90,7 @@ export function RepoInput({ className, autoFocus }: { className?: string; autoFo
           autoCorrect="off"
           aria-label="GitHub repository"
           placeholder="owner/repo"
-          className="tabular min-w-0 flex-1 bg-transparent px-3 text-[14px] text-ink outline-none placeholder:text-ink-ghost sm:pl-0"
+          className="tabular text-ink placeholder:text-ink-ghost min-w-0 flex-1 bg-transparent px-3 text-[14px] outline-none sm:pl-0"
         />
 
         <input
@@ -121,19 +121,19 @@ export function RepoInput({ className, autoFocus }: { className?: string; autoFo
       </form>
 
       <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1.5">
-        <span className="text-[11px] text-ink-ghost">Try</span>
+        <span className="text-ink-ghost text-[11px]">Try</span>
         {SUGGESTIONS.map((suggestion) => (
           <button
             key={suggestion.label}
             type="button"
             onClick={() => submit(suggestion.label)}
             title={suggestion.hint}
-            className="tabular rounded-xs border border-line/70 px-1.5 py-0.5 text-[11px] text-ink-faint transition-colors hover:border-edge/50 hover:bg-edge/10 hover:text-edge-soft"
+            className="tabular border-line/70 text-ink-faint hover:border-edge/50 hover:bg-edge/10 hover:text-edge-soft rounded-xs border px-1.5 py-0.5 text-[11px] transition-colors"
           >
             {suggestion.label}
           </button>
         ))}
-        <span className="ml-auto text-[11px] text-ink-ghost">or drop a .zip</span>
+        <span className="text-ink-ghost ml-auto text-[11px]">or drop a .zip</span>
       </div>
     </div>
   );

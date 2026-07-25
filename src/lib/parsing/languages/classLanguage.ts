@@ -111,8 +111,7 @@ function collectMembers(
       const absolute = bodyStart + nameOffset;
       const parenIndex = bodyStart + match.index + match[0].length - 1;
       const parenEnd = matchBrace(scan.code, parenIndex, '(', ')');
-      const params =
-        parenEnd > 0 ? splitParams(scan.code.slice(parenIndex + 1, parenEnd - 1)) : [];
+      const params = parenEnd > 0 ? splitParams(scan.code.slice(parenIndex + 1, parenEnd - 1)) : [];
       const memberBody = parenEnd > 0 ? readBraceBody(scan, parenEnd) : undefined;
       const line = lineAt(scan, absolute);
       const modifiers = match[1] ?? '';
@@ -241,7 +240,8 @@ export function createClassLanguageParser(config: ClassLangConfig): LanguagePars
           if (!inClass && name) {
             const parenIndex = fn.index + fn[0].length - 1;
             const parenEnd = matchBrace(code, parenIndex, '(', ')');
-            const params = parenEnd > 0 ? splitParams(code.slice(parenIndex + 1, parenEnd - 1)) : [];
+            const params =
+              parenEnd > 0 ? splitParams(code.slice(parenIndex + 1, parenEnd - 1)) : [];
             const body = parenEnd > 0 ? readBraceBody(scan, parenEnd) : undefined;
             const line = lineAt(scan, nameIndex);
             symbols.push(

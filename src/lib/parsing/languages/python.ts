@@ -28,7 +28,10 @@ function collectImports(scan: ScanResult): ImportRef[] {
     if (/^\s*from\s/.test(code.slice(lineStart, match.index + 6))) continue;
     const line = lineAt(scan, match.index);
     for (const entry of match[1].split(',')) {
-      const specifier = entry.trim().split(/\s+as\s+/)[0].trim();
+      const specifier = entry
+        .trim()
+        .split(/\s+as\s+/)[0]
+        .trim();
       if (specifier) imports.push({ specifier, kind: 'static', symbols: ['*'], line });
     }
   }
@@ -38,7 +41,12 @@ function collectImports(scan: ScanResult): ImportRef[] {
     const symbols = match[2]
       .replace(/[()]/g, '')
       .split(',')
-      .map((entry) => entry.trim().split(/\s+as\s+/)[0].trim())
+      .map((entry) =>
+        entry
+          .trim()
+          .split(/\s+as\s+/)[0]
+          .trim(),
+      )
       .filter(Boolean);
     imports.push({ specifier: match[1], kind: 'static', symbols, line });
   }
@@ -59,7 +67,9 @@ function decoratorsAbove(scan: ScanResult, declLine: number): string[] {
 }
 
 function docstringFor(scan: ScanResult, declLine: number): string | undefined {
-  const doc = scan.literals.find((l) => l.kind === 'doc' && l.line >= declLine && l.line <= declLine + 3);
+  const doc = scan.literals.find(
+    (l) => l.kind === 'doc' && l.line >= declLine && l.line <= declLine + 3,
+  );
   if (!doc) return undefined;
   const text = doc.value.trim();
   return text ? text.slice(0, 400) : undefined;
@@ -109,7 +119,10 @@ function collectSymbols(scan: ScanResult, path: string): SymbolDef[] {
     const container = classRanges.find(
       (c) => line > c.start && line <= c.end && indentOf(match[1]) > c.indent,
     );
-    const returnMatch = closeIndex > 0 ? /^\s*->\s*([^:\n]+)/.exec(code.slice(closeIndex + 1, closeIndex + 120)) : null;
+    const returnMatch =
+      closeIndex > 0
+        ? /^\s*->\s*([^:\n]+)/.exec(code.slice(closeIndex + 1, closeIndex + 120))
+        : null;
 
     symbols.push(
       buildSymbol({
@@ -122,7 +135,11 @@ function collectSymbols(scan: ScanResult, path: string): SymbolDef[] {
         language: 'python',
         indentScoped: true,
         container: container?.name,
-        visibility: name.startsWith('__') ? 'private' : name.startsWith('_') ? 'protected' : 'public',
+        visibility: name.startsWith('__')
+          ? 'private'
+          : name.startsWith('_')
+            ? 'protected'
+            : 'public',
         isAsync: Boolean(match[2]),
         isExported: !name.startsWith('_'),
         params: params.filter((p) => p !== 'self' && p !== 'cls'),

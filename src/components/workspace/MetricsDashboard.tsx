@@ -4,6 +4,7 @@ import * as React from 'react';
 import { AlertTriangle, Copy, GitBranch, Layers } from 'lucide-react';
 import type { AnalysisResult } from '@/lib/core/types';
 import { LANGUAGE_COLORS, LANGUAGE_LABELS } from '@/lib/core/languages';
+import { maintainabilityBand } from '@/lib/parsing/complexity';
 import {
   Badge,
   Eyebrow,
@@ -74,7 +75,7 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
           </div>
 
           {languageSegments.length > 0 ? (
-            <div className="border-t border-line px-5 py-4">
+            <div className="border-line border-t px-5 py-4">
               <Eyebrow className="pb-3">Language mix by lines</Eyebrow>
               <StackedBar segments={languageSegments} />
             </div>
@@ -86,13 +87,23 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
           <Panel className="lg:col-span-1">
             <PanelHeader title="Health" detail="Composite scores" />
             <div className="flex items-start justify-around gap-4 p-5">
-              <ScoreDial value={metrics.maintainability.average} label="Maintainability" />
+              <ScoreDial
+                value={metrics.maintainability.average}
+                label="Maintainability"
+                tone={
+                  maintainabilityBand(metrics.maintainability.average) === 'poor'
+                    ? 'bad'
+                    : maintainabilityBand(metrics.maintainability.average) === 'moderate'
+                      ? 'warn'
+                      : 'good'
+                }
+              />
               <ScoreDial value={metrics.debt.score} label="Debt" invert />
               {metrics.coverage ? (
                 <ScoreDial value={metrics.coverage.overall} label="Coverage" />
               ) : null}
             </div>
-            <div className="grid grid-cols-2 gap-4 border-t border-line px-5 py-4">
+            <div className="border-line grid grid-cols-2 gap-4 border-t px-5 py-4">
               <Stat
                 label="Avg complexity"
                 value={metrics.complexity.average}
@@ -103,7 +114,13 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
                 label="Duplication"
                 value={`${(metrics.duplication.ratio * 100).toFixed(1)}%`}
                 detail={`${metrics.duplication.clones.length} clone groups`}
-                tone={metrics.duplication.ratio > 0.08 ? 'bad' : metrics.duplication.ratio > 0.03 ? 'warn' : 'good'}
+                tone={
+                  metrics.duplication.ratio > 0.08
+                    ? 'bad'
+                    : metrics.duplication.ratio > 0.03
+                      ? 'warn'
+                      : 'good'
+                }
               />
               <Stat
                 label="Avg fan-in"
@@ -120,10 +137,7 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
           </Panel>
 
           <Panel className="lg:col-span-2">
-            <PanelHeader
-              title="Distributions"
-              detail="Where files sit on each scale"
-            />
+            <PanelHeader title="Distributions" detail="Where files sit on each scale" />
             <div className="grid gap-6 p-5 sm:grid-cols-3">
               <div>
                 <Eyebrow className="pb-3">Complexity</Eyebrow>
@@ -162,13 +176,15 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
                     label: hotspot.symbol ?? truncatePath(hotspot.path, 40),
                     value: hotspot.complexity,
                     detail: `${truncatePath(hotspot.path, 28)}${hotspot.line ? `:${hotspot.line}` : ''}`,
-                    color:
-                      hotspot.complexity > 20 ? 'var(--color-cycle)' : 'var(--color-warn)',
+                    color: hotspot.complexity > 20 ? 'var(--color-cycle)' : 'var(--color-warn)',
                   }))}
                   onSelect={(datum) => onOpenFile(datum.id.split(':')[0])}
                 />
               ) : (
-                <EmptyState title="No complexity hotspots" description="Nothing exceeds the reporting threshold." />
+                <EmptyState
+                  title="No complexity hotspots"
+                  description="Nothing exceeds the reporting threshold."
+                />
               )}
             </div>
           </Panel>
@@ -202,13 +218,13 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px]">
               <thead>
-                <tr className="border-b border-line">
+                <tr className="border-line border-b">
                   {['Module', 'Files', 'Internal', 'In', 'Out', 'Cohesion', 'Instability'].map(
                     (heading, index) => (
                       <th
                         key={heading}
                         className={cn(
-                          'px-4 py-2 text-[10px] font-medium uppercase tracking-[0.12em] text-ink-ghost',
+                          'text-ink-ghost px-4 py-2 text-[10px] font-medium tracking-[0.12em] uppercase',
                           index === 0 ? 'text-left' : 'text-right',
                         )}
                       >
@@ -222,21 +238,21 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
                 {metrics.coupling.modules.slice(0, 14).map((module) => (
                   <tr
                     key={module.module}
-                    className="border-b border-line/50 transition-colors last:border-0 hover:bg-hover"
+                    className="border-line/50 hover:bg-hover border-b transition-colors last:border-0"
                   >
-                    <td className="tabular max-w-[220px] truncate px-4 py-2 text-[11.5px] text-ink">
+                    <td className="tabular text-ink max-w-[220px] truncate px-4 py-2 text-[11.5px]">
                       {module.module}
                     </td>
-                    <td className="tabular px-4 py-2 text-right text-[11.5px] text-ink-muted">
+                    <td className="tabular text-ink-muted px-4 py-2 text-right text-[11.5px]">
                       {module.files}
                     </td>
-                    <td className="tabular px-4 py-2 text-right text-[11.5px] text-ink-muted">
+                    <td className="tabular text-ink-muted px-4 py-2 text-right text-[11.5px]">
                       {module.internalEdges}
                     </td>
-                    <td className="tabular px-4 py-2 text-right text-[11.5px] text-ink-muted">
+                    <td className="tabular text-ink-muted px-4 py-2 text-right text-[11.5px]">
                       {module.incoming}
                     </td>
-                    <td className="tabular px-4 py-2 text-right text-[11.5px] text-ink-muted">
+                    <td className="tabular text-ink-muted px-4 py-2 text-right text-[11.5px]">
                       {module.outgoing}
                     </td>
                     <td
@@ -251,7 +267,7 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
                     >
                       {module.cohesion.toFixed(2)}
                     </td>
-                    <td className="tabular px-4 py-2 text-right text-[11.5px] text-ink-muted">
+                    <td className="tabular text-ink-muted px-4 py-2 text-right text-[11.5px]">
                       {module.instability.toFixed(2)}
                     </td>
                   </tr>
@@ -268,12 +284,14 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
               title="Debt signals"
               detail={`Score ${metrics.debt.score}/100 — every contributor is listed`}
               action={
-                <Badge tone={metrics.debt.score > 45 ? 'bad' : metrics.debt.score > 20 ? 'warn' : 'good'}>
+                <Badge
+                  tone={metrics.debt.score > 45 ? 'bad' : metrics.debt.score > 20 ? 'warn' : 'good'}
+                >
                   {metrics.debt.score > 45 ? 'High' : metrics.debt.score > 20 ? 'Moderate' : 'Low'}
                 </Badge>
               }
             />
-            <ul className="divide-y divide-line">
+            <ul className="divide-line divide-y">
               {metrics.debt.signals.length ? (
                 metrics.debt.signals.map((signal) => (
                   <li key={signal.id} className="px-4 py-3.5">
@@ -289,8 +307,8 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
                         )}
                       />
                       <div className="min-w-0">
-                        <p className="text-[12.5px] font-medium text-ink">{signal.title}</p>
-                        <p className="mt-1 text-[11.5px] leading-relaxed text-ink-faint">
+                        <p className="text-ink text-[12.5px] font-medium">{signal.title}</p>
+                        <p className="text-ink-faint mt-1 text-[11.5px] leading-relaxed">
                           {signal.detail}
                         </p>
                         {signal.files.length ? (
@@ -300,7 +318,7 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
                                 key={`${path}:${fileIndex}`}
                                 type="button"
                                 onClick={() => onOpenFile(path)}
-                                className="tabular rounded-xs border border-line px-1.5 py-0.5 text-[10px] text-ink-faint transition-colors hover:border-edge/50 hover:text-edge-soft"
+                                className="tabular border-line text-ink-faint hover:border-edge/50 hover:text-edge-soft rounded-xs border px-1.5 py-0.5 text-[10px] transition-colors"
                               >
                                 {truncatePath(path, 34)}
                               </button>
@@ -326,13 +344,13 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
               <PanelHeader
                 title="Duplicate blocks"
                 detail={`${formatCount(metrics.duplication.totalDuplicatedLines)} lines across ${metrics.duplication.clones.length} groups`}
-                action={<Copy className="size-3.5 text-ink-ghost" />}
+                action={<Copy className="text-ink-ghost size-3.5" />}
               />
               {metrics.duplication.clones.length ? (
-                <ul className="divide-y divide-line">
+                <ul className="divide-line divide-y">
                   {metrics.duplication.clones.slice(0, 6).map((clone, index) => (
                     <li key={index} className="px-4 py-3">
-                      <p className="text-[11.5px] text-ink">
+                      <p className="text-ink text-[11.5px]">
                         {clone.lines} lines · {clone.occurrences.length} copies
                       </p>
                       <ul className="mt-1.5 space-y-0.5">
@@ -341,7 +359,7 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
                             <button
                               type="button"
                               onClick={() => onOpenFile(occurrence.path)}
-                              className="tabular text-[10.5px] text-ink-faint transition-colors hover:text-edge-soft"
+                              className="tabular text-ink-faint hover:text-edge-soft text-[10.5px] transition-colors"
                             >
                               {truncatePath(occurrence.path, 46)}:{occurrence.startLine}–
                               {occurrence.endLine}
@@ -361,10 +379,10 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
               <PanelHeader
                 title="Debt markers"
                 detail={`${metrics.debt.markers.length} TODO/FIXME comments`}
-                action={<AlertTriangle className="size-3.5 text-ink-ghost" />}
+                action={<AlertTriangle className="text-ink-ghost size-3.5" />}
               />
               {metrics.debt.markers.length ? (
-                <ul className="max-h-72 divide-y divide-line overflow-y-auto">
+                <ul className="divide-line max-h-72 divide-y overflow-y-auto">
                   {metrics.debt.markers.slice(0, 25).map((marker, index) => (
                     <li key={`${marker.path}:${marker.line}:${index}`} className="px-4 py-2.5">
                       <button
@@ -380,12 +398,12 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
                           >
                             {marker.tag}
                           </Badge>
-                          <span className="tabular truncate text-[10.5px] text-ink-ghost">
+                          <span className="tabular text-ink-ghost truncate text-[10.5px]">
                             {truncatePath(marker.path, 34)}:{marker.line}
                           </span>
                         </span>
                         {marker.text ? (
-                          <span className="mt-1 block truncate text-[11.5px] text-ink-muted">
+                          <span className="text-ink-muted mt-1 block truncate text-[11.5px]">
                             {marker.text}
                           </span>
                         ) : null}
@@ -406,16 +424,16 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
             <PanelHeader
               title="Circular dependencies"
               detail="Each cycle prevents independent testing and effective tree-shaking"
-              action={<GitBranch className="size-3.5 text-cycle" />}
+              action={<GitBranch className="text-cycle size-3.5" />}
             />
-            <ul className="divide-y divide-line">
+            <ul className="divide-line divide-y">
               {result.cycles.slice(0, 10).map((cycle) => (
                 <li key={cycle.id} className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <Badge tone={cycle.severity === 'high' ? 'bad' : 'warn'}>
                       {cycle.severity}
                     </Badge>
-                    <span className="text-[11.5px] text-ink-muted">{cycle.length} files</span>
+                    <span className="text-ink-muted text-[11.5px]">{cycle.length} files</span>
                   </div>
                   <div className="tabular mt-2 flex flex-wrap items-center gap-1 text-[11px]">
                     {cycle.files.map((path, index) => (
@@ -424,7 +442,7 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
                         <button
                           type="button"
                           onClick={() => onOpenFile(path)}
-                          className="rounded-xs px-1 py-0.5 text-ink-muted transition-colors hover:bg-cycle/10 hover:text-cycle"
+                          className="text-ink-muted hover:bg-cycle/10 hover:text-cycle rounded-xs px-1 py-0.5 transition-colors"
                         >
                           {path.split('/').pop()}
                         </button>
@@ -457,10 +475,7 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
           </Panel>
 
           <Panel>
-            <PanelHeader
-              title="External packages"
-              detail="Ranked by how many files import them"
-            />
+            <PanelHeader title="External packages" detail="Ranked by how many files import them" />
             <div className="p-3">
               <BarList
                 data={[...result.dependencies]
@@ -476,7 +491,7 @@ export function MetricsDashboard({ result, onOpenFile }: MetricsDashboardProps) 
                   }))}
               />
               {result.dependencies.some((d) => d.kind === 'runtime' && d.usedBy === 0) ? (
-                <p className="mt-3 px-2 text-[11px] leading-relaxed text-ink-ghost">
+                <p className="text-ink-ghost mt-3 px-2 text-[11px] leading-relaxed">
                   {result.dependencies.filter((d) => d.kind === 'runtime' && d.usedBy === 0).length}{' '}
                   runtime dependencies were never imported in analysed source. Some are used by
                   config or build tooling — verify before removing.

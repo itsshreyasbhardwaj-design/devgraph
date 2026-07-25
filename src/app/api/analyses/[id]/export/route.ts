@@ -2,7 +2,13 @@ import { z } from 'zod';
 import { GRAPH_KINDS, type GraphKind } from '@/lib/core/types';
 import { analysisToMermaid, exportBasename, toMermaid } from '@/lib/export/mermaid';
 import { getAnalysisStore } from '@/lib/storage';
-import { apiError, guard, handleGuardError, NO_STORE_HEADERS, toApiError } from '@/lib/security/api';
+import {
+  apiError,
+  guard,
+  handleGuardError,
+  NO_STORE_HEADERS,
+  toApiError,
+} from '@/lib/security/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,7 +26,10 @@ const querySchema = z.object({
  * rendered geometry already exists — round-tripping that through the server
  * would mean re-implementing layout headlessly for no gain.
  */
-export async function GET(request: Request, context: { params: Promise<{ id: string }> }): Promise<Response> {
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ id: string }> },
+): Promise<Response> {
   try {
     const { userId, headers } = await guard(request, { bucket: 'read', limit: 60 });
     const { id } = await context.params;

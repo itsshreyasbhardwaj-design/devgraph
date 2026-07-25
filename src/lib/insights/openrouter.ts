@@ -29,17 +29,28 @@ Rules:
 - Be direct and useful. An experienced engineer is reading this; do not pad.`;
 
 const TOPIC_PROMPTS: Record<InsightTopic, string> = {
-  overview: 'Explain the overall architecture: what kind of system this is, how it is organised, and the two or three things a new engineer most needs to understand before changing anything.',
-  modules: 'Explain the module structure. Which boundaries are working, which are not, and what the cohesion and instability numbers imply about where change is safe.',
-  'entry-points': 'Explain where execution begins and the order in which a newcomer should read these files to build an accurate mental model.',
-  'auth-flow': 'Explain the authentication and authorisation flow end to end: where identity is established, where it is enforced, and any gap between those two points.',
-  'api-lifecycle': 'Explain the life of a request through this API: routing, middleware, handler, persistence, response. Call out anything inconsistent across endpoints.',
-  'data-flow': 'Explain how data moves through the system, from external input to persistence and back, and how well isolated the persistence layer is.',
-  'state-management': 'Explain how client-side state is managed, what belongs where, and where the current approach will strain as the app grows.',
-  dependencies: 'Explain the dependency structure: internal hubs, external surface, coupling risk, and anything that should be broken up or removed.',
-  performance: 'Explain the structural performance risks visible in this analysis and which are worth profiling first. Be explicit that these are signals, not measurements.',
-  'technical-debt': 'Explain the technical debt: what is actually costly, what is cosmetic, and in what order it should be addressed.',
-  improvements: 'Give a prioritised, concrete improvement plan. For each item: what to change, which files, why it matters, and rough effort.',
+  overview:
+    'Explain the overall architecture: what kind of system this is, how it is organised, and the two or three things a new engineer most needs to understand before changing anything.',
+  modules:
+    'Explain the module structure. Which boundaries are working, which are not, and what the cohesion and instability numbers imply about where change is safe.',
+  'entry-points':
+    'Explain where execution begins and the order in which a newcomer should read these files to build an accurate mental model.',
+  'auth-flow':
+    'Explain the authentication and authorisation flow end to end: where identity is established, where it is enforced, and any gap between those two points.',
+  'api-lifecycle':
+    'Explain the life of a request through this API: routing, middleware, handler, persistence, response. Call out anything inconsistent across endpoints.',
+  'data-flow':
+    'Explain how data moves through the system, from external input to persistence and back, and how well isolated the persistence layer is.',
+  'state-management':
+    'Explain how client-side state is managed, what belongs where, and where the current approach will strain as the app grows.',
+  dependencies:
+    'Explain the dependency structure: internal hubs, external surface, coupling risk, and anything that should be broken up or removed.',
+  performance:
+    'Explain the structural performance risks visible in this analysis and which are worth profiling first. Be explicit that these are signals, not measurements.',
+  'technical-debt':
+    'Explain the technical debt: what is actually costly, what is cosmetic, and in what order it should be addressed.',
+  improvements:
+    'Give a prioritised, concrete improvement plan. For each item: what to change, which files, why it matters, and rough effort.',
 };
 
 export interface StreamInsightOptions {

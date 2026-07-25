@@ -139,9 +139,9 @@ describe('ingestZip', () => {
   });
 
   it('rejects non-zip payloads', () => {
-    expect(() => ingestZip({ data: new TextEncoder().encode('not a zip at all!!!!!!'), filename: 'x.zip' })).toThrow(
-      IngestError,
-    );
+    expect(() =>
+      ingestZip({ data: new TextEncoder().encode('not a zip at all!!!!!!'), filename: 'x.zip' }),
+    ).toThrow(IngestError);
     expect(() => ingestZip({ data: new Uint8Array(4), filename: 'x.zip' })).toThrow(IngestError);
   });
 
@@ -153,11 +153,15 @@ describe('ingestZip', () => {
 
 describe('validateUpload', () => {
   it('accepts a plausible zip', () => {
-    expect(() => validateUpload({ size: 1024, name: 'repo.zip', type: 'application/zip' })).not.toThrow();
+    expect(() =>
+      validateUpload({ size: 1024, name: 'repo.zip', type: 'application/zip' }),
+    ).not.toThrow();
   });
 
   it('rejects wrong types, empty files and oversized uploads', () => {
-    expect(() => validateUpload({ size: 1024, name: 'repo.tar.gz', type: 'application/gzip' })).toThrow();
+    expect(() =>
+      validateUpload({ size: 1024, name: 'repo.tar.gz', type: 'application/gzip' }),
+    ).toThrow();
     expect(() => validateUpload({ size: 0, name: 'repo.zip', type: 'application/zip' })).toThrow();
     expect(() =>
       validateUpload({ size: 999_999_999, name: 'repo.zip', type: 'application/zip' }),

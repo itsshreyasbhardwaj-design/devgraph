@@ -3,13 +3,19 @@ import { z } from 'zod';
 import type { AnalysisStreamEvent, RepoSource } from '@/lib/core/types';
 import { analyzeRepository } from '@/lib/analysis/pipeline';
 import { featureFlags, localRoots, serverEnv } from '@/lib/config/env';
-import { ingestGitHub } from '@/lib/ingest/github';
+import { ingestGitHub, parseRepoInput } from '@/lib/ingest/github';
 import { ingestLocal } from '@/lib/ingest/local';
 import { ingestZip, validateUpload } from '@/lib/ingest/zip';
 import { DEFAULT_INGEST_LIMITS, IngestError, type IngestResult } from '@/lib/ingest/types';
 import { getAnalysisStore } from '@/lib/storage';
 import { sourceKey } from '@/lib/storage/types';
-import { apiError, guard, handleGuardError, NO_STORE_HEADERS, toApiError } from '@/lib/security/api';
+import {
+  apiError,
+  guard,
+  handleGuardError,
+  NO_STORE_HEADERS,
+  toApiError,
+} from '@/lib/security/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -76,6 +82,11 @@ export async function POST(request: Request): Promise<Response> {
       refresh = body.refresh ?? false;
 
       if (body.kind === 'github') {
+        // Validate the reference before the stream opens. Once a streaming
+        // response has started the status code is already committed, so an
+        // obviously malformed input would otherwise return 200 with an error
+        // buried in the body — useless to any non-browser client.
+        parseRepoInput(body.repository);
         ingest = () =>
           ingestGitHub({
             input: body.repository,

@@ -14,7 +14,8 @@ import {
 
 const IMPORT_BLOCK = /\bimport\s*\(/g;
 const IMPORT_SINGLE = /\bimport\s+(?:[\w.]+\s+)?(")/g;
-const FUNC_DECL = /\bfunc\s+(?:\(\s*[\w*\s]+?\s+([\w*[\].]+)\s*\)\s*)?([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)?\(/g;
+const FUNC_DECL =
+  /\bfunc\s+(?:\(\s*[\w*\s]+?\s+([\w*[\].]+)\s*\)\s*)?([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)?\(/g;
 const TYPE_DECL = /\btype\s+([A-Za-z_]\w*)(?:\s*\[[^\]]*\])?\s+(struct|interface)\s*\{/g;
 const TYPE_ALIAS = /\btype\s+([A-Za-z_]\w*)\s*=?\s*([\w.*[\]]+)\s*(?:\n|$)/g;
 const PACKAGE_DECL = /^\s*package\s+([\w]+)/m;
@@ -115,7 +116,8 @@ function collectSymbols(scan: ScanResult, path: string): SymbolDef[] {
     const params = parenEnd > 0 ? splitParams(code.slice(parenIndex + 1, parenEnd - 1)) : [];
     const body = parenEnd > 0 ? readBraceBody(scan, parenEnd) : undefined;
     const line = lineAt(scan, nameIndex);
-    const returnSlice = parenEnd > 0 ? code.slice(parenEnd, body?.bodyStart ?? parenEnd).trim() : '';
+    const returnSlice =
+      parenEnd > 0 ? code.slice(parenEnd, body?.bodyStart ?? parenEnd).trim() : '';
 
     symbols.push(
       buildSymbol({

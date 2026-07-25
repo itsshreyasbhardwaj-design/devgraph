@@ -61,8 +61,10 @@ describe('analysis pipeline', () => {
 
   it('finds the circular dependency between the two services', () => {
     expect(result.cycles.length).toBeGreaterThanOrEqual(1);
-    const cycle = result.cycles.find((c) =>
-      c.files.includes('src/services/orderService.ts') && c.files.includes('src/services/userService.ts'),
+    const cycle = result.cycles.find(
+      (c) =>
+        c.files.includes('src/services/orderService.ts') &&
+        c.files.includes('src/services/userService.ts'),
     );
     expect(cycle).toBeDefined();
     expect(result.graphs.cycles?.nodes.length).toBeGreaterThanOrEqual(2);

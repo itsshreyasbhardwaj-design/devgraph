@@ -48,3 +48,4 @@ next-env.d.ts
 /playwright-report
 /test-results
 /.devgraph-cache
+tests/e2e/fixtures/*.zip

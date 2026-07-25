@@ -194,7 +194,8 @@ export async function analyzeRepository(options: AnalyzeOptions): Promise<Analys
       if (parser) {
         const result = parsers.parse(file);
         parsed.set(file.path, result);
-        if (result.warnings?.length) warnings.push(...result.warnings.map((w) => `${file.path}: ${w}`));
+        if (result.warnings?.length)
+          warnings.push(...result.warnings.map((w) => `${file.path}: ${w}`));
 
         const profile = SCAN_PROFILES[parser.id] ?? SYNTAX_PROFILES.plain;
         const scan = scanSource(file.content, profile);
@@ -303,7 +304,9 @@ export async function analyzeRepository(options: AnalyzeOptions): Promise<Analys
   // FastAPI and Flask) can be attributed to the framework actually present.
   const stack = detectStack({ files: fileRecords, sources: sourceText, manifests });
   const detectedFrameworks = new Set(
-    stack.findings.filter((finding) => finding.category === 'framework').map((finding) => finding.name),
+    stack.findings
+      .filter((finding) => finding.category === 'framework')
+      .map((finding) => finding.name),
   );
 
   // ---- 7. Extractors ----------------------------------------------------

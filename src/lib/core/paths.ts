@@ -200,7 +200,11 @@ export function shouldIgnorePath(path: string): boolean {
   const segments = path.split('/');
   // Ignore lockfiles: huge, low signal.
   const base = segments[segments.length - 1];
-  if (/^(pnpm-lock\.yaml|yarn\.lock|package-lock\.json|Cargo\.lock|poetry\.lock|composer\.lock|Gemfile\.lock|go\.sum)$/.test(base))
+  if (
+    /^(pnpm-lock\.yaml|yarn\.lock|package-lock\.json|Cargo\.lock|poetry\.lock|composer\.lock|Gemfile\.lock|go\.sum)$/.test(
+      base,
+    )
+  )
     return true;
   return segments.some((segment) => IGNORED_DIRECTORIES.has(segment));
 }

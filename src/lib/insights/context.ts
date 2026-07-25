@@ -39,7 +39,9 @@ export function buildAnalysisDigest(
     ...result.stack.languages
       .filter((l) => l.share > 0.01)
       .slice(0, 8)
-      .map((l) => `${l.language}: ${l.files} files, ${l.lines} lines (${(l.share * 100).toFixed(1)}%)`),
+      .map(
+        (l) => `${l.language}: ${l.files} files, ${l.lines} lines (${(l.share * 100).toFixed(1)}%)`,
+      ),
   );
 
   const byCategory = new Map<string, string[]>();
@@ -51,7 +53,9 @@ export function buildAnalysisDigest(
   }
   sections.push(
     heading('DETECTED STACK'),
-    ...[...byCategory.entries()].map(([category, names]) => `${category}: ${names.slice(0, 8).join(', ')}`),
+    ...[...byCategory.entries()].map(
+      ([category, names]) => `${category}: ${names.slice(0, 8).join(', ')}`,
+    ),
   );
 
   sections.push(
@@ -73,28 +77,33 @@ export function buildAnalysisDigest(
     heading('MOST DEPENDED-UPON FILES'),
     ...result.metrics.coupling.mostDependedUpon
       .slice(0, 12)
-      .map((f) => `${f.path}: ${f.fanIn} importers, ${f.fanOut} imports, instability ${f.instability}`),
+      .map(
+        (f) => `${f.path}: ${f.fanIn} importers, ${f.fanOut} imports, instability ${f.instability}`,
+      ),
   );
 
   if (result.apis.length) {
     sections.push(
       heading(`API ROUTES (${result.apis.length} total, showing 25)`),
-      ...result.apis.slice(0, 25).map((r) => `${r.method} ${r.path} → ${r.file}:${r.line} [${r.framework}]`),
+      ...result.apis
+        .slice(0, 25)
+        .map((r) => `${r.method} ${r.path} → ${r.file}:${r.line} [${r.framework}]`),
     );
   }
 
   if (result.schema.tables.length) {
     sections.push(
       heading(`DATABASE SCHEMA (${result.schema.dialect})`),
-      ...result.schema.tables
-        .slice(0, 20)
-        .map(
-          (t) =>
-            `${t.name} (${t.file}:${t.line}): ${t.columns
-              .slice(0, 12)
-              .map((c) => `${c.name}:${c.type}${c.primaryKey ? ' PK' : ''}${c.references ? ` →${c.references.table}` : ''}`)
-              .join(', ')}`,
-        ),
+      ...result.schema.tables.slice(0, 20).map(
+        (t) =>
+          `${t.name} (${t.file}:${t.line}): ${t.columns
+            .slice(0, 12)
+            .map(
+              (c) =>
+                `${c.name}:${c.type}${c.primaryKey ? ' PK' : ''}${c.references ? ` →${c.references.table}` : ''}`,
+            )
+            .join(', ')}`,
+      ),
     );
   }
 
@@ -118,7 +127,9 @@ export function buildAnalysisDigest(
     `average maintainability: ${result.metrics.maintainability.average}/100`,
     `duplication: ${(result.metrics.duplication.ratio * 100).toFixed(1)}% of analysed lines`,
     `average fan-in/fan-out: ${result.metrics.coupling.averageFanIn}/${result.metrics.coupling.averageFanOut}`,
-    result.metrics.coverage ? `test coverage: ${result.metrics.coverage.overall}%` : 'test coverage: not reported',
+    result.metrics.coverage
+      ? `test coverage: ${result.metrics.coverage.overall}%`
+      : 'test coverage: not reported',
     `debt score: ${result.metrics.debt.score}/100`,
   );
 
@@ -126,13 +137,18 @@ export function buildAnalysisDigest(
     heading('COMPLEXITY HOTSPOTS'),
     ...result.metrics.complexity.hotspots
       .slice(0, 15)
-      .map((h) => `${h.symbol ?? '(file)'} at ${h.path}:${h.line ?? 1} — complexity ${h.complexity}, ${h.loc} lines, nesting ${h.maxNesting}`),
+      .map(
+        (h) =>
+          `${h.symbol ?? '(file)'} at ${h.path}:${h.line ?? 1} — complexity ${h.complexity}, ${h.loc} lines, nesting ${h.maxNesting}`,
+      ),
   );
 
   if (result.cycles.length) {
     sections.push(
       heading(`CIRCULAR DEPENDENCIES (${result.cycles.length})`),
-      ...result.cycles.slice(0, 8).map((c) => `[${c.severity}] ${c.files.join(' → ')} → ${c.files[0]}`),
+      ...result.cycles
+        .slice(0, 8)
+        .map((c) => `[${c.severity}] ${c.files.join(' → ')} → ${c.files[0]}`),
     );
   }
 

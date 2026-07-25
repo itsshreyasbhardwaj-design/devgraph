@@ -170,12 +170,16 @@ export function Workspace({ result, aiAvailable, onReanalyze }: WorkspaceProps) 
   );
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden bg-void">
+    <div className="bg-void flex h-dvh flex-col overflow-hidden">
       {/* ------------------------------------------------------------ chrome */}
-      <header className="flex h-12 shrink-0 items-center gap-3 border-b border-line px-3">
+      <header className="border-line flex h-12 shrink-0 items-center gap-3 border-b px-3">
         <Link href="/" className="flex shrink-0 items-center gap-2" aria-label="DevGraph home">
           <svg width="17" height="17" viewBox="0 0 20 20" fill="none" aria-hidden>
-            <path d="M5 5 L15 10 M15 10 L5 15" stroke="var(--color-line-strong)" strokeWidth="1.2" />
+            <path
+              d="M5 5 L15 10 M15 10 L5 15"
+              stroke="var(--color-line-strong)"
+              strokeWidth="1.2"
+            />
             <circle cx="5" cy="5" r="2.6" fill="var(--color-edge)" />
             <circle cx="15" cy="10" r="2.6" fill="var(--color-stable)" />
             <circle cx="5" cy="15" r="2.6" fill="var(--color-signal)" />
@@ -183,9 +187,9 @@ export function Workspace({ result, aiAvailable, onReanalyze }: WorkspaceProps) 
         </Link>
 
         <div className="flex min-w-0 items-baseline gap-2">
-          <h1 className="tabular truncate text-[13px] font-medium text-ink">{result.repo.name}</h1>
+          <h1 className="tabular text-ink truncate text-[13px] font-medium">{result.repo.name}</h1>
           {result.source.ref ? (
-            <span className="tabular hidden shrink-0 text-[11px] text-ink-ghost sm:inline">
+            <span className="tabular text-ink-ghost hidden shrink-0 text-[11px] sm:inline">
               @{result.source.ref}
             </span>
           ) : null}
@@ -210,7 +214,7 @@ export function Workspace({ result, aiAvailable, onReanalyze }: WorkspaceProps) 
           >
             <Search />
             <span className="hidden sm:inline">Search</span>
-            <kbd className="tabular ml-1 hidden rounded-xs border border-line px-1 py-0.5 text-[9.5px] text-ink-ghost sm:block">
+            <kbd className="tabular border-line text-ink-ghost ml-1 hidden rounded-xs border px-1 py-0.5 text-[9.5px] sm:block">
               ⌘K
             </kbd>
           </Button>
@@ -219,8 +223,8 @@ export function Workspace({ result, aiAvailable, onReanalyze }: WorkspaceProps) 
             result={result}
             graph={graph}
             getCanvasElement={() =>
-              canvasRef.current?.querySelector<HTMLElement>('.react-flow__viewport')?.parentElement ??
-              canvasRef.current
+              canvasRef.current?.querySelector<HTMLElement>('.react-flow__viewport')
+                ?.parentElement ?? canvasRef.current
             }
           />
 
@@ -235,7 +239,7 @@ export function Workspace({ result, aiAvailable, onReanalyze }: WorkspaceProps) 
       </header>
 
       {/* ------------------------------------------------------------- tabs */}
-      <div className="flex h-11 shrink-0 items-center gap-2 border-b border-line px-3">
+      <div className="border-line flex h-11 shrink-0 items-center gap-2 border-b px-3">
         <Tooltip content={sidebarOpen ? 'Hide views' : 'Show views'}>
           <Button
             variant="ghost"
@@ -255,7 +259,7 @@ export function Workspace({ result, aiAvailable, onReanalyze }: WorkspaceProps) 
                 <Icon className="size-3.5" />
                 {label}
                 {id === 'insights' && aiAvailable ? (
-                  <span className="ml-0.5 size-1 rounded-full bg-edge" aria-hidden />
+                  <span className="bg-edge ml-0.5 size-1 rounded-full" aria-hidden />
                 ) : null}
               </TabsTrigger>
             ))}
@@ -273,14 +277,14 @@ export function Workspace({ result, aiAvailable, onReanalyze }: WorkspaceProps) 
                 </ul>
               }
             >
-              <span className="flex cursor-default items-center gap-1.5 text-[11px] text-warn">
+              <span className="text-warn flex cursor-default items-center gap-1.5 text-[11px]">
                 <AlertTriangle className="size-3" />
                 {result.warnings.length}
               </span>
             </Tooltip>
           ) : null}
 
-          <span className="tabular hidden text-[11px] text-ink-ghost md:inline">
+          <span className="tabular text-ink-ghost hidden text-[11px] md:inline">
             {formatCount(result.metrics.totals.files)} files ·{' '}
             {formatCount(result.metrics.totals.code)} LOC · {formatDuration(result.durationMs)}
           </span>
@@ -304,7 +308,7 @@ export function Workspace({ result, aiAvailable, onReanalyze }: WorkspaceProps) 
       {/* ------------------------------------------------------------- body */}
       <div className="flex min-h-0 flex-1">
         {sidebarOpen && tab === 'graph' ? (
-          <aside className="hidden w-60 shrink-0 border-r border-line md:block">
+          <aside className="border-line hidden w-60 shrink-0 border-r md:block">
             <ViewRail
               result={result}
               graph={graph}
@@ -360,9 +364,7 @@ export function Workspace({ result, aiAvailable, onReanalyze }: WorkspaceProps) 
             <InsightsPanel result={result} aiAvailable={aiAvailable} onOpenFile={openFile} />
           ) : null}
 
-          {tab === 'metrics' ? (
-            <MetricsDashboard result={result} onOpenFile={openFile} />
-          ) : null}
+          {tab === 'metrics' ? <MetricsDashboard result={result} onOpenFile={openFile} /> : null}
 
           {tab === 'timeline' ? (
             <TimelinePanel
@@ -376,17 +378,18 @@ export function Workspace({ result, aiAvailable, onReanalyze }: WorkspaceProps) 
           {/* Bottom rail: what the canvas is currently showing. */}
           {tab === 'graph' && view ? (
             <div className="glass pointer-events-none absolute bottom-3 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded-md px-3 py-1.5">
-              <span className="tabular text-[11px] text-ink-muted">
-                {formatCount(visible.nodes.length)} nodes · {formatCount(visible.edges.length)} edges
+              <span className="tabular text-ink-muted text-[11px]">
+                {formatCount(visible.nodes.length)} nodes · {formatCount(visible.edges.length)}{' '}
+                edges
               </span>
               {view.truncated ? (
-                <span className="text-[10.5px] text-warn">
+                <span className="text-warn text-[10.5px]">
                   {formatCount(view.truncated.nodes)} trimmed — {view.truncated.reason}
                 </span>
               ) : null}
               {visible.edges.some((edge) => edge.cyclic) ? (
-                <span className="flex items-center gap-1.5 text-[10.5px] text-cycle">
-                  <span className="h-px w-3 bg-cycle" />
+                <span className="text-cycle flex items-center gap-1.5 text-[10.5px]">
+                  <span className="bg-cycle h-px w-3" />
                   cycle
                 </span>
               ) : null}
@@ -395,7 +398,7 @@ export function Workspace({ result, aiAvailable, onReanalyze }: WorkspaceProps) 
         </main>
 
         {inspectorOpen && tab === 'graph' ? (
-          <aside className="hidden w-80 shrink-0 border-l border-line xl:block">
+          <aside className="border-line hidden w-80 shrink-0 border-l xl:block">
             <Inspector
               result={result}
               node={selectedNode}

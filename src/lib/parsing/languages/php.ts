@@ -69,7 +69,10 @@ export const phpParser = createClassLanguageParser({
     for (const match of scan.code.matchAll(USE_GROUP)) {
       const line = lineAt(scan, match.index);
       for (const entry of match[2].split(',')) {
-        const name = entry.trim().split(/\s+as\s+/)[0].trim();
+        const name = entry
+          .trim()
+          .split(/\s+as\s+/)[0]
+          .trim();
         if (!name) continue;
         const specifier = `${match[1]}\\${name}`;
         imports.push({ specifier, kind: 'static', symbols: [name], line });

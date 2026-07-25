@@ -54,7 +54,9 @@ function findingsOf(input: InsightInput, category: StackFinding['category']): St
 }
 
 function nameList(findings: StackFinding[], limit = 4): string {
-  const names = findings.slice(0, limit).map((f) => (f.version ? `${f.name} ${f.version}` : f.name));
+  const names = findings
+    .slice(0, limit)
+    .map((f) => (f.version ? `${f.name} ${f.version}` : f.name));
   if (!names.length) return '';
   if (names.length === 1) return names[0];
   return `${names.slice(0, -1).join(', ')} and ${names[names.length - 1]}`;
@@ -65,7 +67,10 @@ function ref(path: string, line?: number, note?: string): InsightReference {
 }
 
 function bullets(items: string[]): string {
-  return items.filter(Boolean).map((item) => `- ${item}`).join('\n');
+  return items
+    .filter(Boolean)
+    .map((item) => `- ${item}`)
+    .join('\n');
 }
 
 function pct(value: number): string {
@@ -100,7 +105,9 @@ function overviewSection(input: InsightInput): InsightSection {
         : '**Frameworks** — no mainstream framework signature detected; this reads as a library or a bespoke stack.',
       `**Structure** — ${input.metrics.coupling.modules.length} top-level modules, ${input.fileEdges.length.toLocaleString()} internal import edges, ${input.dependencies.length} declared dependencies.`,
       `**Health at a glance** — average maintainability ${metrics.maintainability.average}/100, average complexity ${metrics.complexity.average} per file, ${input.cycles.length} circular dependenc${input.cycles.length === 1 ? 'y' : 'ies'}.`,
-      stack.monorepo ? `**Monorepo** — ${stack.workspaces.length} workspace packages detected.` : '',
+      stack.monorepo
+        ? `**Monorepo** — ${stack.workspaces.length} workspace packages detected.`
+        : '',
     ]),
     '',
     shape.detail,
@@ -123,7 +130,18 @@ function classifyShape(input: InsightInput): {
 } {
   const frameworks = findingsOf(input, 'framework').map((f) => f.name);
   const hasUi = frameworks.some((f) =>
-    ['React', 'Vue', 'Angular', 'Svelte', 'SvelteKit', 'Next.js', 'Nuxt', 'Remix', 'SolidJS', 'Astro'].includes(f),
+    [
+      'React',
+      'Vue',
+      'Angular',
+      'Svelte',
+      'SvelteKit',
+      'Next.js',
+      'Nuxt',
+      'Remix',
+      'SolidJS',
+      'Astro',
+    ].includes(f),
   );
   const hasServer = input.apis.length > 0;
   const hasDb = input.schema.tables.length > 0;
@@ -211,10 +229,16 @@ function modulesSection(input: InsightInput): InsightSection {
     ]),
     '',
     stable.length
-      ? `${nameList(stable.map((m) => ({ name: m.module }) as StackFinding), 3)} ${stable.length === 1 ? 'is a stable core' : 'are stable cores'} — changes there ripple widely, so they deserve the strongest tests.`
+      ? `${nameList(
+          stable.map((m) => ({ name: m.module }) as StackFinding),
+          3,
+        )} ${stable.length === 1 ? 'is a stable core' : 'are stable cores'} — changes there ripple widely, so they deserve the strongest tests.`
       : '',
     unstable.length
-      ? `${nameList(unstable.map((m) => ({ name: m.module }) as StackFinding), 3)} ${unstable.length === 1 ? 'sits' : 'sit'} at the volatile edge of the graph, which is exactly where fast-changing code belongs.`
+      ? `${nameList(
+          unstable.map((m) => ({ name: m.module }) as StackFinding),
+          3,
+        )} ${unstable.length === 1 ? 'sits' : 'sit'} at the volatile edge of the graph, which is exactly where fast-changing code belongs.`
       : '',
   ]
     .filter(Boolean)
@@ -260,21 +284,27 @@ function authFlowSection(input: InsightInput): InsightSection {
   const authFindings = findingsOf(input, 'auth');
   const authFiles = [...input.parsed.values()]
     .filter((file) =>
-      /(auth|session|login|signin|signup|token|jwt|oauth|permission|rbac|guard|middleware)/i.test(file.path),
+      /(auth|session|login|signin|signup|token|jwt|oauth|permission|rbac|guard|middleware)/i.test(
+        file.path,
+      ),
     )
     .sort((a, b) => b.symbols.length - a.symbols.length)
     .slice(0, 10);
 
   const authRoutes = input.apis.filter((route) =>
-    /(auth|login|logout|signin|signup|session|token|oauth|callback|register|password)/i.test(route.path),
+    /(auth|login|logout|signin|signup|session|token|oauth|callback|register|password)/i.test(
+      route.path,
+    ),
   );
 
   const guards = [...input.parsed.values()]
     .flatMap((file) =>
       file.symbols
-        .filter((symbol) =>
-          /^(require|ensure|assert|verify|check|with|protect|authorize|authenticate)/i.test(symbol.name) &&
-          /(auth|user|session|token|permission|role|admin)/i.test(symbol.name),
+        .filter(
+          (symbol) =>
+            /^(require|ensure|assert|verify|check|with|protect|authorize|authenticate)/i.test(
+              symbol.name,
+            ) && /(auth|user|session|token|permission|role|admin)/i.test(symbol.name),
         )
         .map((symbol) => ({ path: file.path, symbol })),
     )
@@ -289,8 +319,7 @@ function authFlowSection(input: InsightInput): InsightSection {
       topic: 'auth-flow',
       title: 'Authentication flow',
       summary: 'No authentication layer detected',
-      body:
-        'No authentication library, auth-shaped route, or guard function was found. If this service is exposed publicly, that is worth confirming deliberately rather than by omission.',
+      body: 'No authentication library, auth-shaped route, or guard function was found. If this service is exposed publicly, that is worth confirming deliberately rather than by omission.',
       references: [],
       confidence: 'low',
     };
@@ -368,7 +397,10 @@ function apiLifecycleSection(input: InsightInput): InsightSection {
     '',
     `**By framework** — ${[...byFramework.entries()].map(([name, count]) => `${name} (${count})`).join(', ')}.`,
     '',
-    `**By method** — ${[...byMethod.entries()].sort((a, b) => b[1] - a[1]).map(([method, count]) => `${method} ${count}`).join(' · ')}. ${writeRoutes.length} of them mutate state.`,
+    `**By method** — ${[...byMethod.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([method, count]) => `${method} ${count}`)
+      .join(' · ')}. ${writeRoutes.length} of them mutate state.`,
     '',
     validation.length ? `**Protocols** — ${nameList(validation)}.` : '',
     '',
@@ -408,7 +440,9 @@ function dataFlowSection(input: InsightInput): InsightSection {
   const databases = findingsOf(input, 'database');
 
   const dataAccessFiles = [...input.parsed.values()]
-    .filter((f) => /(repositor|dao|models?|store|queries|db|database|prisma|drizzle|entities)/i.test(f.path))
+    .filter((f) =>
+      /(repositor|dao|models?|store|queries|db|database|prisma|drizzle|entities)/i.test(f.path),
+    )
     .sort((a, b) => b.symbols.length - a.symbols.length)
     .slice(0, 8);
 
@@ -436,7 +470,9 @@ function dataFlowSection(input: InsightInput): InsightSection {
     '**Flow**',
     '',
     bullets([
-      input.apis.length ? 'Requests enter through the routes listed under *API lifecycle*.' : 'Callers enter through the public module exports.',
+      input.apis.length
+        ? 'Requests enter through the routes listed under *API lifecycle*.'
+        : 'Callers enter through the public module exports.',
       dataAccessFiles.length
         ? 'Handlers delegate to the data-access modules above rather than issuing queries inline — worth preserving.'
         : 'No dedicated data-access layer was found, which usually means queries are written inline in handlers. That makes swapping the datastore expensive.',
@@ -451,7 +487,9 @@ function dataFlowSection(input: InsightInput): InsightSection {
   return {
     topic: 'data-flow',
     title: 'Data flow',
-    summary: schema.tables.length ? `${schema.tables.length} tables · ${schema.dialect}` : 'No schema detected',
+    summary: schema.tables.length
+      ? `${schema.tables.length} tables · ${schema.dialect}`
+      : 'No schema detected',
     body,
     references: [
       ...hottest.slice(0, 4).map((t) => ref(t.file, t.line, t.name)),
@@ -496,13 +534,13 @@ function stateManagementSection(input: InsightInput): InsightSection {
           hooks
             .sort((a, b) => b.symbol.loc - a.symbol.loc)
             .slice(0, 6)
-            .map((h) => `${code(h.symbol.name)} — ${h.path}:${h.symbol.line} (${h.symbol.loc} lines)`),
+            .map(
+              (h) => `${code(h.symbol.name)} — ${h.path}:${h.symbol.line} (${h.symbol.loc} lines)`,
+            ),
         )}`
       : '',
     '',
-    stores.length
-      ? `**Stores and providers**\n\n${bullets(stores.map((f) => code(f.path)))}`
-      : '',
+    stores.length ? `**Stores and providers**\n\n${bullets(stores.map((f) => code(f.path)))}` : '',
     '',
     components.length > 0 && !stateFindings.length
       ? '> With no external store, prop drilling is the failure mode to watch for. The **Component hierarchy** view makes deep chains obvious.'
@@ -516,7 +554,10 @@ function stateManagementSection(input: InsightInput): InsightSection {
     title: 'State management',
     summary: stateFindings.length ? nameList(stateFindings, 2) : `${components.length} components`,
     body,
-    references: [...stores.slice(0, 3).map((f) => ref(f.path)), ...hooks.slice(0, 3).map((h) => ref(h.path, h.symbol.line, h.symbol.name))],
+    references: [
+      ...stores.slice(0, 3).map((f) => ref(f.path)),
+      ...hooks.slice(0, 3).map((h) => ref(h.path, h.symbol.line, h.symbol.name)),
+    ],
     confidence: stateFindings.length ? 'high' : 'medium',
   };
 }
@@ -538,12 +579,19 @@ function dependenciesSection(input: InsightInput): InsightSection {
     '',
     heaviest.length
       ? `**Internal hubs** — files the rest of the codebase leans on hardest:\n\n${bullets(
-          heaviest.map((f) => `${code(f.path)} — ${f.fanIn} importers, instability ${f.instability}`),
+          heaviest.map(
+            (f) => `${code(f.path)} — ${f.fanIn} importers, instability ${f.instability}`,
+          ),
         )}\n\nThese are the highest-leverage files to keep well-tested: a regression here propagates everywhere.`
       : '',
     '',
     unused.length
-      ? `**${unused.length} runtime dependencies were never imported** in analysed source: ${unused.slice(0, 8).map((d) => code(d.name)).join(', ')}. Some will be used by config or build tooling rather than code, so verify before removing.`
+      ? `**${unused.length} runtime dependencies were never imported** in analysed source: ${unused
+          .slice(0, 8)
+          .map((d) => code(d.name))
+          .join(
+            ', ',
+          )}. Some will be used by config or build tooling rather than code, so verify before removing.`
       : '',
     '',
     input.cycles.length
@@ -578,7 +626,11 @@ function performanceSection(input: InsightInput): InsightSection {
     .slice(0, 5);
 
   const barrels = [...input.parsed.values()]
-    .filter((f) => /(^|\/)index\.(ts|js|tsx|jsx)$/.test(f.path) && f.imports.filter((i) => i.kind === 'reexport').length >= 8)
+    .filter(
+      (f) =>
+        /(^|\/)index\.(ts|js|tsx|jsx)$/.test(f.path) &&
+        f.imports.filter((i) => i.kind === 'reexport').length >= 8,
+    )
     .slice(0, 5);
 
   const body = [
@@ -586,13 +638,19 @@ function performanceSection(input: InsightInput): InsightSection {
     '',
     deepNesting.length
       ? `**Deeply nested logic** (nesting ≥ 4) — hot loops hide here:\n\n${bullets(
-          deepNesting.map((h) => `${code(`${h.symbol ?? h.path}`)} — ${h.path}:${h.line ?? 1}, complexity ${h.complexity}, nesting ${h.maxNesting}`),
+          deepNesting.map(
+            (h) =>
+              `${code(`${h.symbol ?? h.path}`)} — ${h.path}:${h.line ?? 1}, complexity ${h.complexity}, nesting ${h.maxNesting}`,
+          ),
         )}`
       : '',
     '',
     bigFiles.length
       ? `**Largest modules** — these dominate parse and bundle time:\n\n${bullets(
-          bigFiles.map((f) => `${code(f.path)} — ${f.lines.toLocaleString()} lines (${(f.bytes / 1024).toFixed(0)} KB)`),
+          bigFiles.map(
+            (f) =>
+              `${code(f.path)} — ${f.lines.toLocaleString()} lines (${(f.bytes / 1024).toFixed(0)} KB)`,
+          ),
         )}`
       : '',
     '',
@@ -637,7 +695,10 @@ function technicalDebtSection(input: InsightInput): InsightSection {
           .map((signal) => {
             const icon = { high: '🔴', medium: '🟠', low: '🟡', info: '🔵' }[signal.severity];
             const files = signal.files.length
-              ? `\n\n  ${signal.files.slice(0, 5).map((f) => code(f)).join(', ')}`
+              ? `\n\n  ${signal.files
+                  .slice(0, 5)
+                  .map((f) => code(f))
+                  .join(', ')}`
               : '';
             return `${icon} **${signal.title}**\n\n  ${signal.detail}${files}`;
           })
@@ -646,7 +707,9 @@ function technicalDebtSection(input: InsightInput): InsightSection {
     '',
     debt.markers.length
       ? `**${debt.markers.length} debt markers** are left in comments:\n\n${bullets(
-          debt.markers.slice(0, 8).map((m) => `${code(m.tag)} ${m.path}:${m.line} — ${m.text || '(no description)'}`),
+          debt.markers
+            .slice(0, 8)
+            .map((m) => `${code(m.tag)} ${m.path}:${m.line} — ${m.text || '(no description)'}`),
         )}`
       : '',
   ]
@@ -658,7 +721,9 @@ function technicalDebtSection(input: InsightInput): InsightSection {
     title: 'Technical debt',
     summary: `Score ${debt.score}/100 · ${debt.signals.length} signals`,
     body,
-    references: debt.signals.flatMap((s) => s.files.slice(0, 2).map((f) => ref(f, undefined, s.id))).slice(0, 8),
+    references: debt.signals
+      .flatMap((s) => s.files.slice(0, 2).map((f) => ref(f, undefined, s.id)))
+      .slice(0, 8),
     confidence: 'high',
   };
 }
@@ -731,7 +796,9 @@ function improvementsSection(input: InsightInput): InsightSection {
     });
   }
 
-  const lowCohesion = metrics.coupling.modules.filter((m) => m.files >= 8 && m.cohesion < 0.4).slice(0, 2);
+  const lowCohesion = metrics.coupling.modules
+    .filter((m) => m.files >= 8 && m.cohesion < 0.4)
+    .slice(0, 2);
   if (lowCohesion.length) {
     suggestions.push({
       title: `Reconsider the boundary of ${lowCohesion.map((m) => code(m.module)).join(' and ')}`,
@@ -748,7 +815,10 @@ function improvementsSection(input: InsightInput): InsightSection {
           (suggestion, index) =>
             `### ${index + 1}. ${suggestion.title}\n\n${suggestion.detail}\n\n**Effort:** ${suggestion.effort}${
               suggestion.files.length
-                ? `  ·  **Files:** ${suggestion.files.slice(0, 4).map((f) => code(f)).join(', ')}`
+                ? `  ·  **Files:** ${suggestion.files
+                    .slice(0, 4)
+                    .map((f) => code(f))
+                    .join(', ')}`
                 : ''
             }`,
         )
@@ -760,7 +830,9 @@ function improvementsSection(input: InsightInput): InsightSection {
     title: 'Suggested improvements',
     summary: `${suggestions.length} recommendations`,
     body,
-    references: suggestions.flatMap((s) => s.files.slice(0, 2).map((f) => ref(f, undefined, s.title))).slice(0, 10),
+    references: suggestions
+      .flatMap((s) => s.files.slice(0, 2).map((f) => ref(f, undefined, s.title)))
+      .slice(0, 10),
     confidence: 'medium',
   };
 }

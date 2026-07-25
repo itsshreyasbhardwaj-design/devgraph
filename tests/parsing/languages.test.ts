@@ -269,9 +269,10 @@ interface Auditable { void audit(String action); }
     expect(list?.container).toBe('UserController');
     expect(list?.returnType).toContain('List');
 
-    expect(result.symbols.find((s) => s.name === 'audit' && s.container === 'UserController')?.visibility).toBe(
-      'private',
-    );
+    expect(
+      result.symbols.find((s) => s.name === 'audit' && s.container === 'UserController')
+        ?.visibility,
+    ).toBe('private');
     expect(result.symbols.find((s) => s.name === 'Auditable')?.kind).toBe('interface');
     expect(result.symbols.some((s) => s.name === 'service' && s.kind === 'variable')).toBe(true);
   });

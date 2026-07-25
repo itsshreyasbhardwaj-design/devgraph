@@ -113,7 +113,7 @@ export function ViewRail({
                         active
                           ? 'bg-edge/12 text-ink'
                           : empty
-                            ? 'cursor-not-allowed text-ink-ghost/60'
+                            ? 'text-ink-ghost/60 cursor-not-allowed'
                             : 'text-ink-muted hover:bg-hover hover:text-ink',
                       )}
                     >
@@ -150,7 +150,7 @@ export function ViewRail({
               <button
                 type="button"
                 onClick={onClearFilters}
-                className="flex items-center gap-1 text-[10.5px] text-ink-faint transition-colors hover:text-ink"
+                className="text-ink-faint hover:text-ink flex items-center gap-1 text-[10.5px] transition-colors"
               >
                 <RotateCcw className="size-2.5" />
                 Reset
@@ -167,8 +167,8 @@ export function ViewRail({
           />
 
           {filters.focusId ? (
-            <div className="mt-2 flex items-center gap-2 rounded-sm border border-edge/30 bg-edge/10 px-2 py-1.5">
-              <span className="flex-1 truncate text-[11px] text-edge-soft">
+            <div className="border-edge/30 bg-edge/10 mt-2 flex items-center gap-2 rounded-sm border px-2 py-1.5">
+              <span className="text-edge-soft flex-1 truncate text-[11px]">
                 Focused · {filters.focusDepth} hop{filters.focusDepth === 1 ? '' : 's'}
               </span>
               <div className="flex items-center gap-0.5">
@@ -192,7 +192,7 @@ export function ViewRail({
               <button
                 type="button"
                 onClick={() => onFiltersChange({ focusId: null })}
-                className="text-[11px] text-ink-faint transition-colors hover:text-ink"
+                className="text-ink-faint hover:text-ink text-[11px] transition-colors"
               >
                 Clear
               </button>
@@ -225,10 +225,10 @@ export function ViewRail({
 
           <div className="mt-4">
             <div className="flex items-center justify-between">
-              <label htmlFor="min-complexity" className="text-[11.5px] text-ink-muted">
+              <label htmlFor="min-complexity" className="text-ink-muted text-[11.5px]">
                 Min complexity
               </label>
-              <span className="tabular text-[11px] text-ink-faint">
+              <span className="tabular text-ink-faint text-[11px]">
                 {filters.minComplexity || 'any'}
               </span>
             </div>
@@ -240,7 +240,7 @@ export function ViewRail({
               step={1}
               value={filters.minComplexity}
               onChange={(event) => onFiltersChange({ minComplexity: Number(event.target.value) })}
-              className="mt-2 h-1 w-full cursor-pointer appearance-none rounded-full bg-line accent-[var(--color-edge)]"
+              className="bg-line mt-2 h-1 w-full cursor-pointer appearance-none rounded-full accent-[var(--color-edge)]"
             />
           </div>
         </section>
@@ -299,7 +299,9 @@ export function ViewRail({
                       aria-pressed={active}
                       className={cn(
                         'tabular flex w-full items-center gap-2 rounded-sm px-2 py-1 text-left text-[11px] transition-colors',
-                        active ? 'bg-edge/12 text-ink' : 'text-ink-faint hover:bg-hover hover:text-ink-muted',
+                        active
+                          ? 'bg-edge/12 text-ink'
+                          : 'text-ink-faint hover:bg-hover hover:text-ink-muted',
                       )}
                     >
                       <span
@@ -313,7 +315,7 @@ export function ViewRail({
                   );
                 })}
                 {groups.length > 24 ? (
-                  <p className="px-2 pt-1 text-[10.5px] text-ink-ghost">
+                  <p className="text-ink-ghost px-2 pt-1 text-[10.5px]">
                     +{groups.length - 24} more — use the filter field
                   </p>
                 ) : null}
@@ -323,7 +325,7 @@ export function ViewRail({
         ) : null}
 
         {hiddenCount > 0 ? (
-          <p className="rounded-sm border border-line bg-raised px-2.5 py-2 text-[11px] text-ink-faint">
+          <p className="border-line bg-raised text-ink-faint rounded-sm border px-2.5 py-2 text-[11px]">
             {formatCount(hiddenCount)} node{hiddenCount === 1 ? '' : 's'} hidden by the current
             filters.
           </p>

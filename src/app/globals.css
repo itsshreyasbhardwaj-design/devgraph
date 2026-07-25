@@ -93,7 +93,9 @@ body {
 .tabular {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
-  font-feature-settings: 'tnum' 1, 'zero' 1;
+  font-feature-settings:
+    'tnum' 1,
+    'zero' 1;
 }
 
 .font-display {
@@ -193,7 +195,9 @@ body {
 }
 
 .react-flow__edge-path {
-  transition: stroke 140ms ease, stroke-opacity 140ms ease;
+  transition:
+    stroke 140ms ease,
+    stroke-opacity 140ms ease;
 }
 
 .react-flow__minimap {

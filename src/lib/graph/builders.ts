@@ -170,7 +170,8 @@ export function buildFolderGraph(input: GraphInput): DevGraphView {
     const id = `dir:${path || '.'}`;
     if (nodes.has(id)) return id;
     const parentPath = path ? dirname(path) : '';
-    const parentId = path && parentPath !== path ? ensureFolder(parentPath === '/' ? '' : parentPath) : undefined;
+    const parentId =
+      path && parentPath !== path ? ensureFolder(parentPath === '/' ? '' : parentPath) : undefined;
     nodes.set(id, {
       id,
       label: path ? basename(path) : '/',
@@ -234,7 +235,10 @@ export function buildFolderGraph(input: GraphInput): DevGraphView {
   }
 
   const allNodes = [...nodes.values()];
-  const depth = allNodes.reduce((max, node) => Math.max(max, (node.path ?? '').split('/').length), 0);
+  const depth = allNodes.reduce(
+    (max, node) => Math.max(max, (node.path ?? '').split('/').length),
+    0,
+  );
   const limited = enforceLimits(allNodes, edges, limits, 'Largest directories and files retained');
 
   return view(
@@ -456,7 +460,10 @@ export function buildClassGraph(input: GraphInput): DevGraphView {
           methods: members
             .filter((m) => m.kind === 'method')
             .slice(0, 24)
-            .map((m) => `${m.visibility === 'private' ? '-' : m.visibility === 'protected' ? '#' : '+'}${m.name}(${m.params.length})`),
+            .map(
+              (m) =>
+                `${m.visibility === 'private' ? '-' : m.visibility === 'protected' ? '#' : '+'}${m.name}(${m.params.length})`,
+            ),
           fields: members
             .filter((m) => m.kind === 'variable')
             .slice(0, 16)
@@ -497,7 +504,14 @@ export function buildClassGraph(input: GraphInput): DevGraphView {
   }
 
   const deduped = dedupeEdges(edges);
-  const depth = graphDepth(computeLayers(buildAdjacency(nodes.map((n) => n.id), deduped)));
+  const depth = graphDepth(
+    computeLayers(
+      buildAdjacency(
+        nodes.map((n) => n.id),
+        deduped,
+      ),
+    ),
+  );
   const limited = enforceLimits(nodes, deduped, limits, 'Types with the most members retained');
 
   return view(
@@ -513,7 +527,13 @@ export function buildClassGraph(input: GraphInput): DevGraphView {
 }
 
 function shortName(name: string): string {
-  return name.split(/[.:\\]/).pop()?.replace(/<.*$/, '').trim() ?? name;
+  return (
+    name
+      .split(/[.:\\]/)
+      .pop()
+      ?.replace(/<.*$/, '')
+      .trim() ?? name
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -534,7 +554,12 @@ export function buildCallGraph(input: GraphInput): DevGraphView {
       nodes.push({
         id: symbol.id,
         label: symbol.container ? `${symbol.container}.${symbol.name}` : symbol.name,
-        kind: symbol.kind === 'method' ? 'method' : symbol.kind === 'component' ? 'component' : 'function',
+        kind:
+          symbol.kind === 'method'
+            ? 'method'
+            : symbol.kind === 'component'
+              ? 'component'
+              : 'function',
         group: moduleKeyFor(parsed.path),
         path: parsed.path,
         line: symbol.line,
@@ -666,7 +691,14 @@ export function buildComponentGraph(input: GraphInput): DevGraphView {
   }
 
   const deduped = dedupeEdges(edges);
-  const depth = graphDepth(computeLayers(buildAdjacency(nodes.map((n) => n.id), deduped)));
+  const depth = graphDepth(
+    computeLayers(
+      buildAdjacency(
+        nodes.map((n) => n.id),
+        deduped,
+      ),
+    ),
+  );
   const limited = enforceLimits(nodes, deduped, limits, 'Most-used components retained');
 
   return view(
@@ -773,7 +805,12 @@ export function buildApiGraph(input: GraphInput): DevGraphView {
         middleware: route.middleware ?? [],
       },
     });
-    edges.push({ id: `${groupId}->${route.id}`, source: groupId, target: route.id, kind: 'contains' });
+    edges.push({
+      id: `${groupId}->${route.id}`,
+      source: groupId,
+      target: route.id,
+      kind: 'contains',
+    });
   }
 
   return view(

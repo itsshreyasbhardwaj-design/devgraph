@@ -137,8 +137,7 @@ function CanvasInner({
 
   const flowEdges = React.useMemo<Edge[]>(() => {
     return edges.map((edge) => {
-      const active =
-        !highlighted || (highlighted.has(edge.source) && highlighted.has(edge.target));
+      const active = !highlighted || (highlighted.has(edge.source) && highlighted.has(edge.target));
       const isSelectedEdge =
         selectedId !== null && (edge.source === selectedId || edge.target === selectedId);
 
@@ -232,7 +231,7 @@ function CanvasInner({
             pannable
             zoomable
             position="bottom-right"
-            className="!bottom-14 !right-3"
+            className="!right-3 !bottom-14"
             maskColor="rgba(8,8,12,0.72)"
             nodeColor={(node) => {
               const data = node.data as DevGraphNodeData | undefined;
@@ -251,7 +250,7 @@ function CanvasInner({
       <ViewportControls />
 
       {layout.degraded ? (
-        <div className="pointer-events-none absolute left-3 top-3 rounded-sm border border-warn/30 bg-warn/10 px-2 py-1 text-[10.5px] text-warn">
+        <div className="border-warn/30 bg-warn/10 text-warn pointer-events-none absolute top-3 left-3 rounded-sm border px-2 py-1 text-[10.5px]">
           Grid layout — {nodes.length.toLocaleString()} nodes is past the layered-layout budget
         </div>
       ) : null}

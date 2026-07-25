@@ -155,8 +155,15 @@ function sum(values: Iterable<number>): number {
  *
  *   MI = max(0, (171 − 5.2·ln(V) − 0.23·G − 16.2·ln(LOC)) · 100 / 171)
  *
- * A comment-density bonus is added back (capped at 100) because well-documented
- * code is genuinely easier to maintain.
+ * A comment-density bonus is added back because well-documented code is
+ * genuinely easier to maintain.
+ *
+ * Read the result with `maintainabilityBand`, not with intuition. On this scale
+ * the `16.2·ln(LOC)` term dominates for anything file-sized, so a healthy
+ * 400-line module lands near 20, not near 80. The bands below match the
+ * thresholds established by the widely used implementations of this same
+ * formula; applying per-function thresholds to a per-file score would mark
+ * almost every real codebase as failing, which tells the reader nothing.
  */
 export function maintainabilityIndex(
   volume: number,
@@ -181,10 +188,17 @@ export function clamp(value: number, min: number, max: number): number {
 
 export type MaintainabilityBand = 'excellent' | 'good' | 'moderate' | 'poor';
 
+/** Thresholds for the normalised 0–100 SEI index. */
+export const MAINTAINABILITY_THRESHOLDS = {
+  excellent: 40,
+  good: 20,
+  moderate: 10,
+} as const;
+
 export function maintainabilityBand(score: number): MaintainabilityBand {
-  if (score >= 85) return 'excellent';
-  if (score >= 70) return 'good';
-  if (score >= 50) return 'moderate';
+  if (score >= MAINTAINABILITY_THRESHOLDS.excellent) return 'excellent';
+  if (score >= MAINTAINABILITY_THRESHOLDS.good) return 'good';
+  if (score >= MAINTAINABILITY_THRESHOLDS.moderate) return 'moderate';
   return 'poor';
 }
 

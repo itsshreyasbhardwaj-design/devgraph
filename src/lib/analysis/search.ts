@@ -83,10 +83,16 @@ export function buildSearchIndex(input: SearchIndexInput): SearchEntry[] {
   }
 
   for (const dir of directories) {
-    push(`search:dir:${dir}`, basename(dir) || dir, 'folder', [
-      { graph: 'folders', nodeId: `dir:${dir}` },
-      { graph: 'modules', nodeId: `mod:${moduleKeyFor(`${dir}/x`)}` },
-    ], { path: dir, detail: dirname(dir) || 'root' });
+    push(
+      `search:dir:${dir}`,
+      basename(dir) || dir,
+      'folder',
+      [
+        { graph: 'folders', nodeId: `dir:${dir}` },
+        { graph: 'modules', nodeId: `mod:${moduleKeyFor(`${dir}/x`)}` },
+      ],
+      { path: dir, detail: dirname(dir) || 'root' },
+    );
   }
 
   for (const parsed of input.parsed.values()) {
@@ -94,7 +100,8 @@ export function buildSearchIndex(input: SearchIndexInput): SearchEntry[] {
       const kind = SYMBOL_KIND_MAP[symbol.kind];
       if (!kind) continue;
       const targets: { graph: GraphKind; nodeId: string }[] = [];
-      if (['class', 'interface'].includes(kind)) targets.push({ graph: 'classes', nodeId: symbol.id });
+      if (['class', 'interface'].includes(kind))
+        targets.push({ graph: 'classes', nodeId: symbol.id });
       if (['function', 'method', 'component'].includes(kind)) {
         targets.push({ graph: 'calls', nodeId: symbol.id });
       }
@@ -117,15 +124,21 @@ export function buildSearchIndex(input: SearchIndexInput): SearchEntry[] {
   }
 
   for (const route of input.apis) {
-    push(`search:route:${route.id}`, `${route.method} ${route.path}`, 'route', [
-      { graph: 'api', nodeId: route.id },
-      { graph: 'imports', nodeId: route.file },
-    ], {
-      path: route.file,
-      line: route.line,
-      detail: `${route.framework} · ${route.style}`,
-      keywords: [route.handler ?? ''],
-    });
+    push(
+      `search:route:${route.id}`,
+      `${route.method} ${route.path}`,
+      'route',
+      [
+        { graph: 'api', nodeId: route.id },
+        { graph: 'imports', nodeId: route.file },
+      ],
+      {
+        path: route.file,
+        line: route.line,
+        detail: `${route.framework} · ${route.style}`,
+        keywords: [route.handler ?? ''],
+      },
+    );
   }
 
   for (const table of input.schema.tables) {
@@ -147,12 +160,16 @@ export function buildSearchIndex(input: SearchIndexInput): SearchEntry[] {
   }
 
   for (const variable of input.env) {
-    push(`search:env:${variable.name}`, variable.name, 'env', [
-      { graph: 'env', nodeId: `env:${variable.name}` },
-    ], {
-      detail: `${variable.usages.length} usages${variable.sensitive ? ' · sensitive' : ''}`,
-      keywords: variable.usages.slice(0, 5).map((u) => u.path),
-    });
+    push(
+      `search:env:${variable.name}`,
+      variable.name,
+      'env',
+      [{ graph: 'env', nodeId: `env:${variable.name}` }],
+      {
+        detail: `${variable.usages.length} usages${variable.sensitive ? ' · sensitive' : ''}`,
+        keywords: variable.usages.slice(0, 5).map((u) => u.path),
+      },
+    );
   }
 
   for (const dependency of input.dependencies) {
@@ -161,7 +178,9 @@ export function buildSearchIndex(input: SearchIndexInput): SearchEntry[] {
       dependency.name,
       'dependency',
       [{ graph: 'modules', nodeId: `pkg:${dependency.name}` }],
-      { detail: `${dependency.kind} · ${dependency.ecosystem}${dependency.version ? ` · ${dependency.version}` : ''}` },
+      {
+        detail: `${dependency.kind} · ${dependency.ecosystem}${dependency.version ? ` · ${dependency.version}` : ''}`,
+      },
     );
   }
 
@@ -189,7 +208,8 @@ export function searchIndex(entries: SearchEntry[], query: string, limit = 40): 
     if (label === needle) score = 1000;
     else if (label.startsWith(needle)) score = 800 - label.length;
     else if (label.includes(needle)) score = 600 - label.indexOf(needle);
-    else if (entry.haystack.includes(needle)) score = 300 - Math.min(200, entry.haystack.indexOf(needle));
+    else if (entry.haystack.includes(needle))
+      score = 300 - Math.min(200, entry.haystack.indexOf(needle));
     else {
       const fuzzy = subsequenceScore(label, needle);
       if (fuzzy > 0) score = fuzzy;
@@ -201,7 +221,9 @@ export function searchIndex(entries: SearchEntry[], query: string, limit = 40): 
     hits.push({ entry, score });
   }
 
-  return hits.sort((a, b) => b.score - a.score || a.entry.label.length - b.entry.label.length).slice(0, limit);
+  return hits
+    .sort((a, b) => b.score - a.score || a.entry.label.length - b.entry.label.length)
+    .slice(0, limit);
 }
 
 /** Cheap camelCase-friendly subsequence match: `gsi` matches `getSearchIndex`. */

@@ -1,0 +1,86 @@
+name: Bug report
+description: Something does not work, or DevGraph got a repository wrong.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the report. **Analysis bugs are far easier to fix with a
+        public repository to reproduce against** — if DevGraph got something
+        wrong about a repo, naming it is the single most useful thing you can do.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Analysis — imports, symbols or calls are wrong
+        - Analysis — routes, schema or config extraction
+        - Analysis — metrics or cycle detection
+        - Stack detection — a framework was missed or misidentified
+        - Graph rendering, layout or interaction
+        - Insights
+        - Export
+        - Ingestion — GitHub, ZIP or local
+        - API
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: repository
+    attributes:
+      label: Repository to reproduce with
+      description: A public repository DevGraph gets wrong, if applicable.
+      placeholder: owner/repo, or owner/repo@branch
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      placeholder: |
+        The import graph should show an edge from src/a.ts to src/b.ts.
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead
+      description: Include the exact numbers or output where you can.
+      placeholder: |
+        No edge appears. b.ts is imported via the "#internal/*" subpath import
+        declared in package.json.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Analyse owner/repo
+        2. Open the Import graph view
+        3. Search for "b.ts"
+
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      placeholder: v0.1.0, or the commit SHA
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Where
+      options:
+        - A hosted instance
+        - Local development (pnpm dev)
+        - Self-hosted production build
+        - Docker
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else
+      description: Console errors, screenshots, the exported JSON — all welcome.

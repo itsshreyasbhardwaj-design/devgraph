@@ -38,7 +38,8 @@ const METHOD_TONE: Record<string, string> = {
 };
 
 function railColor(node: GraphNode): string {
-  if (node.language) return LANGUAGE_COLORS[node.language as LanguageId] ?? 'var(--color-ink-ghost)';
+  if (node.language)
+    return LANGUAGE_COLORS[node.language as LanguageId] ?? 'var(--color-ink-ghost)';
   switch (node.kind) {
     case 'external':
     case 'package':
@@ -72,7 +73,7 @@ function Frame({
   return (
     <div
       className={cn(
-        'group relative h-full w-full overflow-hidden rounded-md border bg-raised/95 transition-[opacity,border-color,box-shadow] duration-150',
+        'group bg-raised/95 relative h-full w-full overflow-hidden rounded-md border transition-[opacity,border-color,box-shadow] duration-150',
         selected
           ? 'border-edge shadow-[0_0_0_1px_var(--color-edge),0_10px_30px_-12px_var(--color-edge)]'
           : cyclic
@@ -106,7 +107,7 @@ export function FileNode({ data }: NodeProps) {
 
   return (
     <Frame data={nodeData}>
-      <div className="flex h-full items-center gap-2 pl-3 pr-2.5">
+      <div className="flex h-full items-center gap-2 pr-2.5 pl-3">
         {collapsible ? (
           <button
             type="button"
@@ -115,23 +116,25 @@ export function FileNode({ data }: NodeProps) {
               onToggleCollapse(node.id);
             }}
             aria-label={collapsed ? `Expand ${node.label}` : `Collapse ${node.label}`}
-            className="-ml-1 rounded-xs p-0.5 text-ink-ghost transition-colors hover:bg-hover hover:text-ink"
+            className="text-ink-ghost hover:bg-hover hover:text-ink -ml-1 rounded-xs p-0.5 transition-colors"
           >
-            <ChevronRight className={cn('size-3 transition-transform', !collapsed && 'rotate-90')} />
+            <ChevronRight
+              className={cn('size-3 transition-transform', !collapsed && 'rotate-90')}
+            />
           </button>
         ) : null}
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
             {node.kind === 'entry' ? (
-              <Zap className="size-3 shrink-0 text-stable" aria-label="Entry point" />
+              <Zap className="text-stable size-3 shrink-0" aria-label="Entry point" />
             ) : null}
-            <span className="tabular truncate text-[11.5px] leading-none text-ink">
+            <span className="tabular text-ink truncate text-[11.5px] leading-none">
               {node.label}
             </span>
           </div>
           {node.metrics?.loc ? (
-            <div className="tabular mt-1 flex items-center gap-2 text-[9.5px] leading-none text-ink-ghost">
+            <div className="tabular text-ink-ghost mt-1 flex items-center gap-2 text-[9.5px] leading-none">
               <span>{node.metrics.loc} LOC</span>
               {node.metrics.fanIn !== undefined ? (
                 <span title="Files importing this / files it imports">
@@ -145,7 +148,7 @@ export function FileNode({ data }: NodeProps) {
         {/* A two-bar readout: complexity height, maintainability colour. */}
         {complexity > 0 ? (
           <div
-            className="flex h-5 w-1 shrink-0 flex-col justify-end rounded-full bg-line"
+            className="bg-line flex h-5 w-1 shrink-0 flex-col justify-end rounded-full"
             title={`Complexity ${complexity}${maintainability ? ` · maintainability ${maintainability}` : ''}`}
           >
             <span
@@ -178,15 +181,18 @@ export function FolderNode({ data }: NodeProps) {
           event.stopPropagation();
           onToggleCollapse(node.id);
         }}
-        className="flex h-full w-full items-center gap-2 pl-3 pr-2.5 text-left"
+        className="flex h-full w-full items-center gap-2 pr-2.5 pl-3 text-left"
         aria-expanded={!collapsed}
       >
         <ChevronRight
-          className={cn('size-3 shrink-0 text-ink-ghost transition-transform', !collapsed && 'rotate-90')}
+          className={cn(
+            'text-ink-ghost size-3 shrink-0 transition-transform',
+            !collapsed && 'rotate-90',
+          )}
         />
-        <span className="tabular flex-1 truncate text-[11.5px] text-ink-muted">{node.label}</span>
+        <span className="tabular text-ink-muted flex-1 truncate text-[11.5px]">{node.label}</span>
         {node.metrics?.loc ? (
-          <span className="tabular shrink-0 text-[9.5px] text-ink-ghost">
+          <span className="tabular text-ink-ghost shrink-0 text-[9.5px]">
             {Intl.NumberFormat('en', { notation: 'compact' }).format(node.metrics.loc)}
           </span>
         ) : null}
@@ -205,31 +211,40 @@ export function ClassNode({ data }: NodeProps) {
   const methods = (node.meta?.methods as string[] | undefined) ?? [];
   const fields = (node.meta?.fields as string[] | undefined) ?? [];
   const stereotype =
-    node.kind === 'interface' ? 'interface' : node.kind === 'enum' ? 'enum' : (node.meta?.kind as string) ?? 'class';
+    node.kind === 'interface'
+      ? 'interface'
+      : node.kind === 'enum'
+        ? 'enum'
+        : ((node.meta?.kind as string) ?? 'class');
 
   return (
     <Frame data={nodeData}>
       <div className="flex h-full flex-col">
-        <div className="border-b border-line px-3 py-1.5">
-          <div className="text-[9px] uppercase tracking-[0.14em] text-ink-ghost">
+        <div className="border-line border-b px-3 py-1.5">
+          <div className="text-ink-ghost text-[9px] tracking-[0.14em] uppercase">
             {node.meta?.isAbstract ? 'abstract ' : ''}
             {stereotype}
           </div>
-          <div className="tabular mt-0.5 truncate text-[12px] font-medium text-ink">{node.label}</div>
+          <div className="tabular text-ink mt-0.5 truncate text-[12px] font-medium">
+            {node.label}
+          </div>
         </div>
         <div className="min-h-0 flex-1 overflow-hidden px-3 py-1.5">
           {fields.slice(0, 4).map((field) => (
-            <div key={field} className="tabular truncate text-[10px] leading-[15px] text-ink-faint">
+            <div key={field} className="tabular text-ink-faint truncate text-[10px] leading-[15px]">
               <span className="text-ink-ghost">+</span> {field}
             </div>
           ))}
           {methods.slice(0, 6).map((method) => (
-            <div key={method} className="tabular truncate text-[10px] leading-[15px] text-ink-muted">
+            <div
+              key={method}
+              className="tabular text-ink-muted truncate text-[10px] leading-[15px]"
+            >
               {method}
             </div>
           ))}
           {methods.length > 6 ? (
-            <div className="tabular text-[10px] leading-[15px] text-ink-ghost">
+            <div className="tabular text-ink-ghost text-[10px] leading-[15px]">
               +{methods.length - 6} more
             </div>
           ) : null}
@@ -250,13 +265,13 @@ export function FunctionNode({ data }: NodeProps) {
 
   return (
     <Frame data={nodeData}>
-      <div className="flex h-full items-center gap-2 pl-3 pr-2.5">
+      <div className="flex h-full items-center gap-2 pr-2.5 pl-3">
         <div className="min-w-0 flex-1">
-          <div className="tabular flex items-center gap-1.5 truncate text-[11.5px] leading-none text-ink">
-            {node.meta?.isAsync ? <span className="text-[9px] text-edge-soft">async</span> : null}
+          <div className="tabular text-ink flex items-center gap-1.5 truncate text-[11.5px] leading-none">
+            {node.meta?.isAsync ? <span className="text-edge-soft text-[9px]">async</span> : null}
             {node.label}
           </div>
-          <div className="tabular mt-1 truncate text-[9.5px] leading-none text-ink-ghost">
+          <div className="tabular text-ink-ghost mt-1 truncate text-[9.5px] leading-none">
             {node.path?.split('/').pop()}
             {node.line ? `:${node.line}` : ''}
           </div>
@@ -294,13 +309,18 @@ export function RouteNode({ data }: NodeProps) {
 
   return (
     <Frame data={nodeData}>
-      <div className="flex h-full items-center gap-2 pl-3 pr-2.5">
-        <span className={cn('tabular shrink-0 text-[10px] font-medium', METHOD_TONE[method] ?? 'text-ink-faint')}>
+      <div className="flex h-full items-center gap-2 pr-2.5 pl-3">
+        <span
+          className={cn(
+            'tabular shrink-0 text-[10px] font-medium',
+            METHOD_TONE[method] ?? 'text-ink-faint',
+          )}
+        >
           {method}
         </span>
-        <span className="tabular min-w-0 flex-1 truncate text-[11.5px] text-ink">{path}</span>
+        <span className="tabular text-ink min-w-0 flex-1 truncate text-[11.5px]">{path}</span>
         {node.meta?.framework ? (
-          <span className="shrink-0 text-[9px] text-ink-ghost">{String(node.meta.framework)}</span>
+          <span className="text-ink-ghost shrink-0 text-[9px]">{String(node.meta.framework)}</span>
         ) : null}
       </div>
     </Frame>
@@ -319,13 +339,16 @@ export function TableNode({ data }: NodeProps) {
   return (
     <Frame data={nodeData} accent="var(--color-stable)">
       <div className="flex h-full flex-col">
-        <div className="flex items-center justify-between border-b border-line px-3 py-1.5">
-          <span className="tabular truncate text-[12px] font-medium text-ink">{node.label}</span>
-          <span className="tabular shrink-0 text-[9px] text-ink-ghost">{columns.length}</span>
+        <div className="border-line flex items-center justify-between border-b px-3 py-1.5">
+          <span className="tabular text-ink truncate text-[12px] font-medium">{node.label}</span>
+          <span className="tabular text-ink-ghost shrink-0 text-[9px]">{columns.length}</span>
         </div>
         <div className="min-h-0 flex-1 overflow-hidden px-3 py-1.5">
           {columns.slice(0, 10).map((column) => (
-            <div key={column} className="tabular truncate text-[10px] leading-[15px] text-ink-faint">
+            <div
+              key={column}
+              className="tabular text-ink-faint truncate text-[10px] leading-[15px]"
+            >
               {column}
             </div>
           ))}
@@ -346,13 +369,18 @@ export function EnvNode({ data }: NodeProps) {
   const exposed = Boolean(node.meta?.clientExposed);
 
   return (
-    <Frame data={nodeData} accent={exposed && sensitive ? 'var(--color-cycle)' : 'var(--color-warn)'}>
-      <div className="flex h-full items-center gap-2 pl-3 pr-2.5">
-        {sensitive ? <Lock className="size-3 shrink-0 text-warn" aria-label="Looks sensitive" /> : null}
-        <span className="tabular min-w-0 flex-1 truncate text-[11px] text-ink">{node.label}</span>
+    <Frame
+      data={nodeData}
+      accent={exposed && sensitive ? 'var(--color-cycle)' : 'var(--color-warn)'}
+    >
+      <div className="flex h-full items-center gap-2 pr-2.5 pl-3">
+        {sensitive ? (
+          <Lock className="text-warn size-3 shrink-0" aria-label="Looks sensitive" />
+        ) : null}
+        <span className="tabular text-ink min-w-0 flex-1 truncate text-[11px]">{node.label}</span>
         {exposed ? (
           <span
-            className="shrink-0 rounded-xs bg-cycle/15 px-1 py-0.5 text-[8.5px] uppercase tracking-wide text-cycle"
+            className="bg-cycle/15 text-cycle shrink-0 rounded-xs px-1 py-0.5 text-[8.5px] tracking-wide uppercase"
             title="Bundlers inline this into client JavaScript"
           >
             public
@@ -372,14 +400,14 @@ export function ExternalNode({ data }: NodeProps) {
   const { node } = nodeData;
 
   return (
-    <Frame data={nodeData} accent="var(--color-ink-ghost)" className="border-dashed bg-surface/80">
-      <div className="flex h-full items-center gap-2 pl-3 pr-2.5">
-        <CornerDownRight className="size-3 shrink-0 text-ink-ghost" />
-        <span className="tabular min-w-0 flex-1 truncate text-[11px] text-ink-muted">
+    <Frame data={nodeData} accent="var(--color-ink-ghost)" className="bg-surface/80 border-dashed">
+      <div className="flex h-full items-center gap-2 pr-2.5 pl-3">
+        <CornerDownRight className="text-ink-ghost size-3 shrink-0" />
+        <span className="tabular text-ink-muted min-w-0 flex-1 truncate text-[11px]">
           {node.label}
         </span>
         {node.metrics?.fanIn ? (
-          <span className="tabular shrink-0 text-[9.5px] text-ink-ghost">{node.metrics.fanIn}</span>
+          <span className="tabular text-ink-ghost shrink-0 text-[9.5px]">{node.metrics.fanIn}</span>
         ) : null}
       </div>
     </Frame>

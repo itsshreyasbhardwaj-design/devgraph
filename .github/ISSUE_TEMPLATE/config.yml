@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or idea
+    url: https://github.com/itsshreyasbhardwaj-design/devgraph/discussions
+    about: Ask a question, propose a feature, or share what you built.
+  - name: Security vulnerability
+    url: https://github.com/itsshreyasbhardwaj-design/devgraph/security/advisories/new
+    about: Report privately. Please do not open a public issue.

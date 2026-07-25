@@ -33,7 +33,11 @@ interface StreamState {
 export function InsightsPanel({ result, aiAvailable, onOpenFile }: InsightsPanelProps) {
   const sections = result.insights.sections;
   const [active, setActive] = React.useState<InsightTopic>(sections[0]?.topic ?? 'overview');
-  const [stream, setStream] = React.useState<StreamState>({ topic: null, text: '', status: 'idle' });
+  const [stream, setStream] = React.useState<StreamState>({
+    topic: null,
+    text: '',
+    status: 'idle',
+  });
   const [showOriginal, setShowOriginal] = React.useState(false);
   const abortRef = React.useRef<AbortController | null>(null);
 
@@ -99,7 +103,7 @@ export function InsightsPanel({ result, aiAvailable, onOpenFile }: InsightsPanel
   return (
     <div className="flex h-full min-h-0">
       {/* ------------------------------------------------------ topic rail */}
-      <nav className="hidden w-56 shrink-0 border-r border-line lg:block">
+      <nav className="border-line hidden w-56 shrink-0 border-r lg:block">
         <ScrollArea className="h-full">
           <div className="p-3">
             <Eyebrow className="px-1.5 pb-2">Topics</Eyebrow>
@@ -118,7 +122,7 @@ export function InsightsPanel({ result, aiAvailable, onOpenFile }: InsightsPanel
                     )}
                   >
                     <span className="block truncate text-[12.5px]">{entry.title}</span>
-                    <span className="mt-0.5 block truncate text-[10.5px] text-ink-ghost">
+                    <span className="text-ink-ghost mt-0.5 block truncate text-[10.5px]">
                       {entry.summary}
                     </span>
                   </button>
@@ -141,7 +145,7 @@ export function InsightsPanel({ result, aiAvailable, onOpenFile }: InsightsPanel
               id="insight-topic"
               value={active}
               onChange={(event) => selectTopic(event.target.value as InsightTopic)}
-              className="h-9 w-full rounded-md border border-line bg-pit px-3 text-sm text-ink"
+              className="border-line bg-pit text-ink h-9 w-full rounded-md border px-3 text-sm"
             >
               {sections.map((entry) => (
                 <option key={entry.topic} value={entry.topic}>
@@ -153,10 +157,10 @@ export function InsightsPanel({ result, aiAvailable, onOpenFile }: InsightsPanel
 
           <header className="flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
-              <h2 className="font-display text-[22px] font-semibold leading-tight text-ink">
+              <h2 className="font-display text-ink text-[22px] leading-tight font-semibold">
                 {section.title}
               </h2>
-              <p className="mt-1.5 text-[12.5px] text-ink-faint">{section.summary}</p>
+              <p className="text-ink-faint mt-1.5 text-[12.5px]">{section.summary}</p>
             </div>
             <div className="flex shrink-0 items-center gap-2">
               <Badge tone={showingAi ? 'accent' : 'neutral'}>
@@ -170,13 +174,9 @@ export function InsightsPanel({ result, aiAvailable, onOpenFile }: InsightsPanel
 
           {showingAi ? (
             <>
-              <Markdown
-                content={stream.text}
-                knownPaths={knownPaths}
-                onFileClick={onOpenFile}
-              />
+              <Markdown content={stream.text} knownPaths={knownPaths} onFileClick={onOpenFile} />
               {stream.status === 'streaming' ? (
-                <span className="ml-0.5 inline-block h-4 w-1.5 animate-pulse bg-edge align-middle" />
+                <span className="bg-edge ml-0.5 inline-block h-4 w-1.5 animate-pulse align-middle" />
               ) : null}
             </>
           ) : (
@@ -194,7 +194,7 @@ export function InsightsPanel({ result, aiAvailable, onOpenFile }: InsightsPanel
                       type="button"
                       onClick={() => onOpenFile(reference.path)}
                       title={reference.note}
-                      className="tabular rounded-xs border border-line px-2 py-1 text-[11px] text-ink-faint transition-colors hover:border-edge/50 hover:bg-edge/10 hover:text-edge-soft"
+                      className="tabular border-line text-ink-faint hover:border-edge/50 hover:bg-edge/10 hover:text-edge-soft rounded-xs border px-2 py-1 text-[11px] transition-colors"
                     >
                       {reference.path}
                       {reference.line ? `:${reference.line}` : ''}
@@ -206,10 +206,12 @@ export function InsightsPanel({ result, aiAvailable, onOpenFile }: InsightsPanel
           ) : null}
 
           {/* ---------------------------------------------------- AI control */}
-          <Panel className="mt-10 bg-raised/50">
+          <Panel className="bg-raised/50 mt-10">
             <div className="flex flex-wrap items-center gap-3 p-4">
-              <Sparkles className={cn('size-4 shrink-0', aiAvailable ? 'text-edge' : 'text-ink-ghost')} />
-              <p className="min-w-0 flex-1 text-[12.5px] leading-relaxed text-ink-muted">
+              <Sparkles
+                className={cn('size-4 shrink-0', aiAvailable ? 'text-edge' : 'text-ink-ghost')}
+              />
+              <p className="text-ink-muted min-w-0 flex-1 text-[12.5px] leading-relaxed">
                 {aiAvailable
                   ? 'Expand this section with a model. It reads a factual digest of the analysis — never your source — and every file it cites is verified against the real file list.'
                   : 'AI expansion is off on this instance. Set OPENROUTER_API_KEY to enable it; everything above is computed without a model either way.'}
@@ -234,13 +236,21 @@ export function InsightsPanel({ result, aiAvailable, onOpenFile }: InsightsPanel
                   disabled={!aiAvailable}
                   onClick={expand}
                 >
-                  {stream.status === 'streaming' ? <Loader2 className="animate-spin" /> : <Sparkles />}
+                  {stream.status === 'streaming' ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    <Sparkles />
+                  )}
                   Expand with AI
                 </Button>
               )}
 
               {stream.topic === active && stream.text ? (
-                <Button variant="ghost" size="sm" onClick={() => setShowOriginal((value) => !value)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowOriginal((value) => !value)}
+                >
                   {showOriginal ? 'Show AI version' : 'Show original'}
                 </Button>
               ) : null}

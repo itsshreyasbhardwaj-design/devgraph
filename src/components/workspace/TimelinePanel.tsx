@@ -51,7 +51,10 @@ export function TimelinePanel({ result, timeline, status, onLoad }: TimelinePane
   const [fromChoice, setFromIndex] = React.useState<number | null>(null);
   const [toChoice, setToIndex] = React.useState<number | null>(null);
   const fromIndex = Math.min(fromChoice ?? 0, Math.max(0, snapshots.length - 1));
-  const toIndex = Math.min(toChoice ?? Math.max(0, snapshots.length - 1), Math.max(0, snapshots.length - 1));
+  const toIndex = Math.min(
+    toChoice ?? Math.max(0, snapshots.length - 1),
+    Math.max(0, snapshots.length - 1),
+  );
 
   if (status === 'idle' || (!timeline && status !== 'loading')) {
     return (
@@ -146,10 +149,7 @@ export function TimelinePanel({ result, timeline, status, onLoad }: TimelinePane
 
         {series.length ? (
           <Panel>
-            <PanelHeader
-              title="Module growth"
-              detail="Files per module across sampled commits"
-            />
+            <PanelHeader title="Module growth" detail="Files per module across sampled commits" />
             <div className="p-5">
               <LineChart series={series} height={220} />
             </div>
@@ -159,7 +159,7 @@ export function TimelinePanel({ result, timeline, status, onLoad }: TimelinePane
         {snapshots.length > 1 ? (
           <Panel>
             <PanelHeader title="Compare commits" detail="Diff any two sampled points" />
-            <div className="grid gap-4 border-b border-line p-5 sm:grid-cols-2">
+            <div className="border-line grid gap-4 border-b p-5 sm:grid-cols-2">
               <SnapshotPicker
                 label="From"
                 snapshots={snapshots}
@@ -183,12 +183,12 @@ export function TimelinePanel({ result, timeline, status, onLoad }: TimelinePane
                       {diff.moduleDelta.slice(0, 12).map((entry) => (
                         <li
                           key={entry.module}
-                          className="flex items-baseline justify-between gap-3 rounded-sm px-2 py-1 hover:bg-hover"
+                          className="hover:bg-hover flex items-baseline justify-between gap-3 rounded-sm px-2 py-1"
                         >
-                          <span className="tabular min-w-0 flex-1 truncate text-[11.5px] text-ink-muted">
+                          <span className="tabular text-ink-muted min-w-0 flex-1 truncate text-[11.5px]">
                             {entry.module}
                           </span>
-                          <span className="tabular shrink-0 text-[10.5px] text-ink-ghost">
+                          <span className="tabular text-ink-ghost shrink-0 text-[10.5px]">
                             {entry.before} → {entry.after}
                           </span>
                           <span
@@ -204,7 +204,7 @@ export function TimelinePanel({ result, timeline, status, onLoad }: TimelinePane
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-[12px] text-ink-ghost">No module changed size.</p>
+                    <p className="text-ink-ghost text-[12px]">No module changed size.</p>
                   )}
                 </div>
 
@@ -237,14 +237,14 @@ export function TimelinePanel({ result, timeline, status, onLoad }: TimelinePane
               detail="When packages entered and left the manifest"
             />
             {timeline.dependencyEvents.length ? (
-              <ul className="divide-y divide-line">
+              <ul className="divide-line divide-y">
                 {timeline.dependencyEvents.slice(0, 12).map((event) => (
                   <li key={event.sha} className="px-4 py-3">
                     <div className="flex items-center gap-2">
-                      <span className="tabular text-[10.5px] text-ink-ghost">
+                      <span className="tabular text-ink-ghost text-[10.5px]">
                         {new Date(event.date).toISOString().slice(0, 10)}
                       </span>
-                      <span className="tabular text-[10.5px] text-ink-ghost">
+                      <span className="tabular text-ink-ghost text-[10.5px]">
                         {event.sha.slice(0, 7)}
                       </span>
                     </div>
@@ -270,13 +270,13 @@ export function TimelinePanel({ result, timeline, status, onLoad }: TimelinePane
 
           <Panel>
             <PanelHeader title="Recent commits" detail={`${timeline.commits.length} loaded`} />
-            <ul className="max-h-[420px] divide-y divide-line overflow-y-auto">
+            <ul className="divide-line max-h-[420px] divide-y overflow-y-auto">
               {timeline.commits.slice(0, 40).map((commit) => (
                 <li key={commit.sha} className="flex gap-3 px-4 py-2.5">
-                  <GitCommitHorizontal className="mt-0.5 size-3.5 shrink-0 text-ink-ghost" />
+                  <GitCommitHorizontal className="text-ink-ghost mt-0.5 size-3.5 shrink-0" />
                   <div className="min-w-0">
-                    <p className="truncate text-[12px] text-ink-muted">{commit.message}</p>
-                    <p className="tabular mt-0.5 truncate text-[10px] text-ink-ghost">
+                    <p className="text-ink-muted truncate text-[12px]">{commit.message}</p>
+                    <p className="tabular text-ink-ghost mt-0.5 truncate text-[10px]">
                       {commit.shortSha} · {commit.author} ·{' '}
                       {new Date(commit.date).toISOString().slice(0, 10)}
                     </p>
@@ -305,14 +305,14 @@ function SnapshotPicker({
   const id = React.useId();
   return (
     <div>
-      <label htmlFor={id} className="mb-1.5 block text-[11px] text-ink-faint">
+      <label htmlFor={id} className="text-ink-faint mb-1.5 block text-[11px]">
         {label}
       </label>
       <select
         id={id}
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
-        className="tabular h-9 w-full rounded-md border border-line bg-pit px-2.5 text-[12px] text-ink"
+        className="tabular border-line bg-pit text-ink h-9 w-full rounded-md border px-2.5 text-[12px]"
       >
         {snapshots.map((snapshot, index) => (
           <option key={snapshot.sha} value={index}>
@@ -352,14 +352,14 @@ function DependencyList({
           {names.slice(0, 20).map((name) => (
             <span
               key={name}
-              className="tabular rounded-xs border border-line px-1.5 py-0.5 text-[10.5px] text-ink-muted"
+              className="tabular border-line text-ink-muted rounded-xs border px-1.5 py-0.5 text-[10.5px]"
             >
               {name}
             </span>
           ))}
         </div>
       ) : (
-        <p className="mt-1 text-[11px] text-ink-ghost">None.</p>
+        <p className="text-ink-ghost mt-1 text-[11px]">None.</p>
       )}
     </div>
   );

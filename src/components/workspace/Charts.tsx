@@ -44,12 +44,10 @@ export function BarList({
         return (
           <li key={datum.id}>
             <Wrapper
-              {...(onSelect
-                ? { type: 'button' as const, onClick: () => onSelect(datum) }
-                : {})}
+              {...(onSelect ? { type: 'button' as const, onClick: () => onSelect(datum) } : {})}
               className={cn(
                 'group relative block w-full overflow-hidden rounded-sm px-2 py-1.5 text-left',
-                onSelect && 'cursor-pointer transition-colors hover:bg-hover',
+                onSelect && 'hover:bg-hover cursor-pointer transition-colors',
               )}
             >
               <span
@@ -58,13 +56,17 @@ export function BarList({
                 style={{ width, backgroundColor: datum.color ?? 'var(--color-edge)' }}
               />
               <span className="relative flex items-baseline gap-3">
-                <span className="tabular min-w-0 flex-1 truncate text-[11.5px] text-ink-muted">
+                <span className="tabular text-ink-muted min-w-0 flex-1 truncate text-[11.5px]">
                   {datum.label}
                 </span>
                 {datum.detail ? (
-                  <span className="tabular shrink-0 text-[10px] text-ink-ghost">{datum.detail}</span>
+                  <span className="tabular text-ink-ghost shrink-0 text-[10px]">
+                    {datum.detail}
+                  </span>
                 ) : null}
-                <span className="tabular shrink-0 text-[11.5px] text-ink">{format(datum.value)}</span>
+                <span className="tabular text-ink shrink-0 text-[11.5px]">
+                  {format(datum.value)}
+                </span>
               </span>
             </Wrapper>
           </li>
@@ -90,7 +92,7 @@ export function Histogram({
     <div className={cn('flex items-end gap-1.5', className)}>
       {buckets.map((bucket) => (
         <div key={bucket.label} className="group flex min-w-0 flex-1 flex-col items-center gap-1.5">
-          <span className="tabular text-[10px] text-ink-faint opacity-0 transition-opacity group-hover:opacity-100">
+          <span className="tabular text-ink-faint text-[10px] opacity-0 transition-opacity group-hover:opacity-100">
             {bucket.count}
           </span>
           <div
@@ -102,7 +104,7 @@ export function Histogram({
             }}
             title={`${bucket.label}: ${bucket.count}`}
           />
-          <span className="w-full truncate text-center text-[9.5px] leading-tight text-ink-ghost">
+          <span className="text-ink-ghost w-full truncate text-center text-[9.5px] leading-tight">
             {bucket.label}
           </span>
         </div>
@@ -123,7 +125,7 @@ export function StackedBar({
 
   return (
     <div className={className}>
-      <div className="flex h-2 w-full overflow-hidden rounded-full bg-line">
+      <div className="bg-line flex h-2 w-full overflow-hidden rounded-full">
         {segments.map((segment) => (
           <div
             key={segment.label}
@@ -143,8 +145,8 @@ export function StackedBar({
               className="size-2 shrink-0 rounded-[2px]"
               style={{ backgroundColor: segment.color }}
             />
-            <span className="text-[11.5px] text-ink-muted">{segment.label}</span>
-            <span className="tabular text-[11px] text-ink-ghost">
+            <span className="text-ink-muted text-[11.5px]">{segment.label}</span>
+            <span className="tabular text-ink-ghost text-[11px]">
               {((segment.value / total) * 100).toFixed(1)}%
             </span>
           </li>
@@ -177,8 +179,7 @@ export function LineChart({
   const maxY = Math.max(1, ...allPoints.map((point) => point.y));
 
   const scaleX = (x: number) =>
-    padding.left +
-    ((x - minX) / Math.max(1, maxX - minX)) * (width - padding.left - padding.right);
+    padding.left + ((x - minX) / Math.max(1, maxX - minX)) * (width - padding.left - padding.right);
   const scaleY = (y: number) =>
     height - padding.bottom - (y / maxY) * (height - padding.top - padding.bottom);
 
@@ -186,7 +187,12 @@ export function LineChart({
 
   return (
     <div className={className}>
-      <svg viewBox={`0 0 ${width} ${height}`} className="w-full" role="img" aria-label="Module growth over time">
+      <svg
+        viewBox={`0 0 ${width} ${height}`}
+        className="w-full"
+        role="img"
+        aria-label="Module growth over time"
+      >
         {gridValues.map((value) => (
           <g key={value}>
             <line
@@ -212,7 +218,9 @@ export function LineChart({
 
         {series.map((entry) => {
           const path = entry.points
-            .map((point, index) => `${index === 0 ? 'M' : 'L'} ${scaleX(point.x)} ${scaleY(point.y)}`)
+            .map(
+              (point, index) => `${index === 0 ? 'M' : 'L'} ${scaleX(point.x)} ${scaleY(point.y)}`,
+            )
             .join(' ');
           return (
             <g key={entry.name}>
@@ -235,7 +243,7 @@ export function LineChart({
         {series.map((entry) => (
           <li key={entry.name} className="flex items-center gap-1.5">
             <span className="h-0.5 w-3 rounded-full" style={{ backgroundColor: entry.color }} />
-            <span className="tabular text-[11px] text-ink-muted">{entry.name}</span>
+            <span className="tabular text-ink-muted text-[11px]">{entry.name}</span>
           </li>
         ))}
       </ul>
@@ -309,7 +317,7 @@ export function ScoreDial({
           {Math.round(value)}
         </text>
       </svg>
-      <span className="mt-1 text-[10px] uppercase tracking-[0.13em] text-ink-ghost">{label}</span>
+      <span className="text-ink-ghost mt-1 text-[10px] tracking-[0.13em] uppercase">{label}</span>
     </div>
   );
 }

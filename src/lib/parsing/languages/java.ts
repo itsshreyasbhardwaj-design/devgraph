@@ -5,7 +5,8 @@ import { createClassLanguageParser, splitTypeList } from './classLanguage';
 const IMPORT_DECL = /^[ \t]*import\s+(static\s+)?([\w.]+(?:\.\*)?)\s*;/gm;
 const PACKAGE_DECL = /^[ \t]*package\s+([\w.]+)\s*;/m;
 
-const MODIFIERS = '(?:public|protected|private|static|final|abstract|sealed|non-sealed|strictfp|default|native|synchronized|transient|volatile)';
+const MODIFIERS =
+  '(?:public|protected|private|static|final|abstract|sealed|non-sealed|strictfp|default|native|synchronized|transient|volatile)';
 
 const TYPE_DECL = new RegExp(
   `(?:^|[\\n;{}])\\s*((?:${MODIFIERS}\\s+)*)(class|interface|enum|record|@interface)\\s+([A-Za-z_]\\w*)\\s*(?:<[^{]*?>)?\\s*(?:\\([^)]*\\))?\\s*((?:extends|implements)[^{]+)?\\{`,

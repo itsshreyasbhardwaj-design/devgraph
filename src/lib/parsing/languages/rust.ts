@@ -17,14 +17,16 @@ const MOD_DECL = /^[ \t]*(?:pub(?:\([^)]*\))?\s+)?mod\s+([A-Za-z_]\w*)\s*[;{]/gm
 const EXTERN_CRATE = /^[ \t]*extern\s+crate\s+([A-Za-z_]\w*)/gm;
 const STRUCT_DECL =
   /(?:^|[^\w])(?:(pub)(?:\([^)]*\))?\s+)?struct\s+([A-Za-z_]\w*)(?:\s*<[^>{;]*>)?\s*[{(;]/gm;
-const ENUM_DECL = /(?:^|[^\w])(?:(pub)(?:\([^)]*\))?\s+)?enum\s+([A-Za-z_]\w*)(?:\s*<[^>{]*>)?\s*\{/gm;
+const ENUM_DECL =
+  /(?:^|[^\w])(?:(pub)(?:\([^)]*\))?\s+)?enum\s+([A-Za-z_]\w*)(?:\s*<[^>{]*>)?\s*\{/gm;
 const TRAIT_DECL =
   /(?:^|[^\w])(?:(pub)(?:\([^)]*\))?\s+)?(?:unsafe\s+)?trait\s+([A-Za-z_]\w*)(?:\s*<[^>{]*>)?\s*(?::[^{]*)?\{/gm;
 const IMPL_DECL =
   /(?:^|[^\w])impl(?:\s*<[^>]*>)?\s+(?:([\w:]+)(?:\s*<[^>]*>)?\s+for\s+)?([\w:]+)(?:\s*<[^>]*>)?\s*(?:where[^{]*)?\{/gm;
 const FN_DECL =
   /(?:^|[^\w])(?:(pub)(?:\([^)]*\))?\s+)?(?:(const)\s+)?(?:(async)\s+)?(?:unsafe\s+)?(?:extern\s+"[^"]*"\s+)?fn\s+([A-Za-z_]\w*)(?:\s*<[^>(]*>)?\s*\(/gm;
-const TYPE_ALIAS = /(?:^|[^\w])(?:(pub)(?:\([^)]*\))?\s+)?type\s+([A-Za-z_]\w*)(?:\s*<[^>=]*>)?\s*=/gm;
+const TYPE_ALIAS =
+  /(?:^|[^\w])(?:(pub)(?:\([^)]*\))?\s+)?type\s+([A-Za-z_]\w*)(?:\s*<[^>=]*>)?\s*=/gm;
 
 /** Expand `use a::{b, c::d}` into individual paths. */
 function expandUse(spec: string): string[] {

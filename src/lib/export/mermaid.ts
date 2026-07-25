@@ -24,7 +24,10 @@ export const DEFAULT_MERMAID_OPTIONS: MermaidOptions = {
 
 /** Mermaid ids must be alphanumeric-ish and stable across runs. */
 function safeId(raw: string): string {
-  const cleaned = raw.replace(/[^A-Za-z0-9]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+  const cleaned = raw
+    .replace(/[^A-Za-z0-9]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '');
   return cleaned ? `n_${cleaned}`.slice(0, 60) : `n_${hash(raw)}`;
 }
 
@@ -42,7 +45,10 @@ function escapeLabel(label: string): string {
 }
 
 /** Trim a view down to the highest-degree nodes plus their edges. */
-function limitView(view: DevGraphView, maxNodes: number): { nodes: GraphNode[]; edges: DevGraphView['edges'] } {
+function limitView(
+  view: DevGraphView,
+  maxNodes: number,
+): { nodes: GraphNode[]; edges: DevGraphView['edges'] } {
   if (view.nodes.length <= maxNodes) return { nodes: view.nodes, edges: view.edges };
 
   const degree = new Map<string, number>();
@@ -51,16 +57,16 @@ function limitView(view: DevGraphView, maxNodes: number): { nodes: GraphNode[]; 
     degree.set(edge.target, (degree.get(edge.target) ?? 0) + 1);
   }
   const nodes = [...view.nodes]
-    .sort((a, b) => (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) || (b.weight ?? 0) - (a.weight ?? 0))
+    .sort(
+      (a, b) =>
+        (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) || (b.weight ?? 0) - (a.weight ?? 0),
+    )
     .slice(0, maxNodes);
   const ids = new Set(nodes.map((n) => n.id));
   return { nodes, edges: view.edges.filter((e) => ids.has(e.source) && ids.has(e.target)) };
 }
 
-export function toMermaid(
-  view: DevGraphView,
-  options: Partial<MermaidOptions> = {},
-): string {
+export function toMermaid(view: DevGraphView, options: Partial<MermaidOptions> = {}): string {
   const config = { ...DEFAULT_MERMAID_OPTIONS, ...options };
 
   switch (view.kind) {
@@ -115,7 +121,12 @@ function flowchart(view: DevGraphView, options: MermaidOptions): string {
 
   const cyclic = edges.filter((edge) => edge.cyclic);
   if (cyclic.length) {
-    lines.push(`  linkStyle ${edges.map((e, i) => (e.cyclic ? i : -1)).filter((i) => i >= 0).join(',')} stroke:#ef4444,stroke-width:2px`);
+    lines.push(
+      `  linkStyle ${edges
+        .map((e, i) => (e.cyclic ? i : -1))
+        .filter((i) => i >= 0)
+        .join(',')} stroke:#ef4444,stroke-width:2px`,
+    );
   }
 
   if (view.nodes.length > nodes.length) {
@@ -216,7 +227,16 @@ export function analysisToMermaid(result: AnalysisResult, kinds?: GraphKind[]): 
   for (const kind of selected) {
     const view = result.graphs[kind];
     if (!view || !view.nodes.length) continue;
-    blocks.push(`## ${view.title}`, '', view.description, '', '```mermaid', toMermaid(view), '```', '');
+    blocks.push(
+      `## ${view.title}`,
+      '',
+      view.description,
+      '',
+      '```mermaid',
+      toMermaid(view),
+      '```',
+      '',
+    );
   }
 
   return blocks.join('\n');

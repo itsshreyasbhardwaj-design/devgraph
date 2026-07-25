@@ -152,7 +152,8 @@ function readPackageJson(file: SourceFile, data: ManifestData): void {
     }
     if (typeof json.bin === 'string') data.declaredEntries.push(json.bin.replace(/^\.\//, ''));
     else if (json.bin) {
-      for (const value of Object.values(json.bin)) data.declaredEntries.push(value.replace(/^\.\//, ''));
+      for (const value of Object.values(json.bin))
+        data.declaredEntries.push(value.replace(/^\.\//, ''));
     }
   }
 
@@ -169,13 +170,79 @@ function readPackageJson(file: SourceFile, data: ManifestData): void {
   }
 }
 
+/**
+ * Strip comments and trailing commas from JSONC.
+ *
+ * This is a character walk rather than a regex because tsconfig files are full
+ * of glob patterns. A naive block-comment regex sees the slash-star inside a
+ * path alias such as the `@` wildcard mapping, then matches it against the
+ * star-slash inside a recursive include glob, and silently deletes everything
+ * between them — which quietly drops `paths` and collapses the import graph.
+ * Only text outside string literals is considered here.
+ */
+export function stripJsonComments(source: string): string {
+  let output = '';
+  let inString = false;
+  let inLineComment = false;
+  let inBlockComment = false;
+
+  for (let i = 0; i < source.length; i += 1) {
+    const char = source[i];
+    const next = source[i + 1];
+
+    if (inLineComment) {
+      if (char === '\n') {
+        inLineComment = false;
+        output += char;
+      }
+      continue;
+    }
+    if (inBlockComment) {
+      if (char === '*' && next === '/') {
+        inBlockComment = false;
+        i += 1;
+      } else if (char === '\n') {
+        output += char;
+      }
+      continue;
+    }
+    if (inString) {
+      output += char;
+      if (char === '\\') {
+        output += next ?? '';
+        i += 1;
+      } else if (char === '"') {
+        inString = false;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inString = true;
+      output += char;
+      continue;
+    }
+    if (char === '/' && next === '/') {
+      inLineComment = true;
+      i += 1;
+      continue;
+    }
+    if (char === '/' && next === '*') {
+      inBlockComment = true;
+      i += 1;
+      continue;
+    }
+    output += char;
+  }
+
+  // Trailing commas are legal in tsconfig but not in JSON.
+  return output.replace(/,(\s*[}\]])/g, '$1');
+}
+
 function readTsconfig(file: SourceFile, data: ManifestData): void {
-  // tsconfig allows comments and trailing commas; strip both before parsing.
-  const stripped = file.content
-    .replace(/\/\*[\s\S]*?\*\//g, '')
-    .replace(/(^|[^:"'])\/\/.*$/gm, '$1')
-    .replace(/,(\s*[}\]])/g, '$1');
-  const json = JSON.parse(stripped) as { compilerOptions?: { baseUrl?: string; paths?: Record<string, string[]> } };
+  const json = JSON.parse(stripJsonComments(file.content)) as {
+    compilerOptions?: { baseUrl?: string; paths?: Record<string, string[]> };
+  };
   const options = json.compilerOptions;
   if (!options?.paths && !options?.baseUrl) return;
   const prefix = dirname(file.path);
@@ -209,7 +276,9 @@ function readPyproject(file: SourceFile, data: ManifestData): void {
   if (nameMatch) data.projectName ??= nameMatch[1];
 
   // PEP 621 `dependencies = [...]`
-  for (const block of file.content.matchAll(/^\s*(?:dependencies|dev-dependencies)\s*=\s*\[([\s\S]*?)\]/gm)) {
+  for (const block of file.content.matchAll(
+    /^\s*(?:dependencies|dev-dependencies)\s*=\s*\[([\s\S]*?)\]/gm,
+  )) {
     const dev = block[0].includes('dev-');
     for (const entry of block[1].matchAll(/["']([^"']+)["']/g)) {
       const name = /^([A-Za-z0-9._-]+)/.exec(entry[1])?.[1];
@@ -343,8 +412,7 @@ function readComposerJson(file: SourceFile, data: ManifestData): void {
     'autoload-dev'?: { 'psr-4'?: Record<string, string | string[]> };
   };
   const prefix = dirname(file.path);
-  const rebase = (value: string) =>
-    (prefix ? `${prefix}/${value}` : value).replace(/\/$/, '');
+  const rebase = (value: string) => (prefix ? `${prefix}/${value}` : value).replace(/\/$/, '');
 
   data.projectName ??= json.name;
   data.projectDescription ??= json.description;
@@ -375,7 +443,9 @@ function readComposerJson(file: SourceFile, data: ManifestData): void {
 // -- Ruby --------------------------------------------------------------------
 
 function readGemfile(file: SourceFile, data: ManifestData): void {
-  for (const match of file.content.matchAll(/^\s*gem\s+["']([^"']+)["'](?:\s*,\s*["']([^"']+)["'])?/gm)) {
+  for (const match of file.content.matchAll(
+    /^\s*gem\s+["']([^"']+)["'](?:\s*,\s*["']([^"']+)["'])?/gm,
+  )) {
     add(data, match[1], match[2], 'runtime', 'rubygems', file.path);
   }
 }

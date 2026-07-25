@@ -78,7 +78,8 @@ const CALL_KEYWORD_BLOCKLIST = new Set([
   'die',
 ]);
 
-const CALL_PATTERN = /([A-Za-z_$][A-Za-z0-9_$]*(?:\s*[.:>-]{1,2}\s*[A-Za-z_$][A-Za-z0-9_$]*)*)\s*\(/g;
+const CALL_PATTERN =
+  /([A-Za-z_$][A-Za-z0-9_$]*(?:\s*[.:>-]{1,2}\s*[A-Za-z_$][A-Za-z0-9_$]*)*)\s*\(/g;
 
 export interface SymbolRange {
   name: string;
@@ -160,28 +161,55 @@ const ENV_PATTERNS: { re: RegExp; group: number; accessor: string }[] = [
 ];
 
 /**
+ * Whole-environment access: `safeParse(process.env)`, `cleanEnv(process.env)`,
+ * `{ ...process.env }`. A `process.env` not followed by `.` or `[` is being
+ * handed to something wholesale rather than read for one key.
+ */
+const ENV_OBJECT_ACCESS = /\b(?:process\.env|import\.meta\.env|os\.environ)\b(?![.[])/;
+
+/** Object-literal keys that look like environment variables. */
+const ENV_SCHEMA_KEY = /(^|[\s{,])([A-Z][A-Z0-9_]{2,})\s*:/gm;
+
+/**
  * Environment variable references. Runs against the *original* source because
  * the variable name lives inside a string literal that the mask blanks out.
  */
 export function collectEnvRefs(scan: ScanResult): EnvRef[] {
   const refs: EnvRef[] = [];
   const seen = new Set<string>();
+
+  const push = (name: string, line: number, accessor: string) => {
+    const key = `${name}@${line}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    refs.push({ name, line, accessor });
+  };
+
   for (const { re, group, accessor } of ENV_PATTERNS) {
     const rex = new RegExp(re.source, re.flags);
     let match = rex.exec(scan.original);
     while (match !== null) {
       const name = match[group];
       if (name && /^[A-Za-z_][A-Za-z0-9_.]*$/.test(name)) {
-        const line = lineAt(scan, match.index);
-        const key = `${name}@${line}`;
-        if (!seen.has(key)) {
-          seen.add(key);
-          refs.push({ name, line, accessor });
-        }
+        push(name, lineAt(scan, match.index), accessor);
       }
       match = rex.exec(scan.original);
     }
   }
+
+  // Schema-validated environments — `z.object({ DATABASE_URL: … })` fed the
+  // whole of `process.env` — never touch a named property, so the patterns
+  // above see nothing. In a file that hands the environment over wholesale,
+  // treat SCREAMING_SNAKE object keys as the declared variable names.
+  if (ENV_OBJECT_ACCESS.test(scan.code)) {
+    const rex = new RegExp(ENV_SCHEMA_KEY.source, ENV_SCHEMA_KEY.flags);
+    let match = rex.exec(scan.code);
+    while (match !== null) {
+      push(match[2], lineAt(scan, match.index), 'env schema');
+      match = rex.exec(scan.code);
+    }
+  }
+
   return refs;
 }
 
@@ -331,7 +359,11 @@ export function buildSymbol(options: BuildSymbolOptions): SymbolDef {
 }
 
 /** Leading `///`, `//`, `/** … *\/` or `#` documentation above a declaration. */
-export function docCommentAbove(original: string, declOffset: number, prefixes: string[]): string | undefined {
+export function docCommentAbove(
+  original: string,
+  declOffset: number,
+  prefixes: string[],
+): string | undefined {
   const before = original.slice(Math.max(0, declOffset - 2000), declOffset);
   const lines = before.split('\n');
   lines.pop(); // partial line containing the declaration

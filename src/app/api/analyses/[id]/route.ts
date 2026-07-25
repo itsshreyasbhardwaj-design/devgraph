@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getAnalysisStore } from '@/lib/storage';
-import { apiError, guard, handleGuardError, NO_STORE_HEADERS, toApiError } from '@/lib/security/api';
+import {
+  apiError,
+  guard,
+  handleGuardError,
+  NO_STORE_HEADERS,
+  toApiError,
+} from '@/lib/security/api';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

@@ -26,7 +26,11 @@ export function extractDebtMarkers(path: string, content: string, limit = 40): D
         path,
         line: i + 1,
         tag: match[1].toUpperCase(),
-        text: match[2].trim().replace(/\*\/\s*$/, '').trim().slice(0, 160),
+        text: match[2]
+          .trim()
+          .replace(/\*\/\s*$/, '')
+          .trim()
+          .slice(0, 160),
       });
       match = rex.exec(line);
     }
@@ -45,7 +49,9 @@ export interface DebtInput {
 }
 
 const HIGH_COMPLEXITY = 20;
-const LOW_MAINTAINABILITY = 55;
+// See `maintainabilityBand`: on the per-file SEI scale, below 10 is the band
+// that genuinely correlates with code people avoid touching.
+const LOW_MAINTAINABILITY = 10;
 const LARGE_FILE_LINES = 600;
 
 /**
@@ -95,7 +101,8 @@ export function buildDebtReport(input: DebtInput): TechnicalDebtReport {
       id: 'large-files',
       title: `${large.length} files are longer than ${LARGE_FILE_LINES} lines of code`,
       severity: severityFromRatio(large.length / analysedCount, 0.03, 0.1),
-      detail: 'Long files usually hide several responsibilities and slow down navigation and review.',
+      detail:
+        'Long files usually hide several responsibilities and slow down navigation and review.',
       files: large.slice(0, 10).map((f) => f.path),
       metric: large.length,
     });
@@ -118,10 +125,13 @@ export function buildDebtReport(input: DebtInput): TechnicalDebtReport {
     signals.push({
       id: 'duplication',
       title: `${(input.duplication.ratio * 100).toFixed(1)}% of analysed lines appear in duplicated blocks`,
-      severity: input.duplication.ratio > 0.1 ? 'high' : input.duplication.ratio > 0.05 ? 'medium' : 'low',
+      severity:
+        input.duplication.ratio > 0.1 ? 'high' : input.duplication.ratio > 0.05 ? 'medium' : 'low',
       detail:
         'Duplicated logic drifts apart over time, so a fix applied in one copy silently misses the others.',
-      files: input.duplication.clones.slice(0, 5).flatMap((c) => c.occurrences.slice(0, 2).map((o) => o.path)),
+      files: input.duplication.clones
+        .slice(0, 5)
+        .flatMap((c) => c.occurrences.slice(0, 2).map((o) => o.path)),
       metric: Number((input.duplication.ratio * 100).toFixed(1)),
     });
   }
@@ -176,13 +186,15 @@ export function buildDebtReport(input: DebtInput): TechnicalDebtReport {
   return {
     score,
     markers: input.markers.slice(0, 300),
-    signals: signals.sort(
-      (a, b) => severityWeights[b.severity] - severityWeights[a.severity],
-    ),
+    signals: signals.sort((a, b) => severityWeights[b.severity] - severityWeights[a.severity]),
   };
 }
 
-function severityFromRatio(ratio: number, mediumAt: number, highAt: number): DebtSignal['severity'] {
+function severityFromRatio(
+  ratio: number,
+  mediumAt: number,
+  highAt: number,
+): DebtSignal['severity'] {
   if (ratio >= highAt) return 'high';
   if (ratio >= mediumAt) return 'medium';
   return 'low';

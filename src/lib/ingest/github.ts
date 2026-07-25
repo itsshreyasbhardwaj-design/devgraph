@@ -37,9 +37,10 @@ export function parseRepoInput(input: string): ParsedRepoRef {
   let ref: string | undefined;
 
   const sshMatch = /^git@github\.com:([^/]+)\/(.+?)(?:\.git)?$/.exec(trimmed);
-  const urlMatch = /^(?:https?:\/\/)?(?:www\.)?github\.com\/([^/\s]+)\/([^/\s?#]+)(?:\/(?:tree|commit|blob)\/([^\s?#]+))?/.exec(
-    trimmed,
-  );
+  const urlMatch =
+    /^(?:https?:\/\/)?(?:www\.)?github\.com\/([^/\s]+)\/([^/\s?#]+)(?:\/(?:tree|commit|blob)\/([^\s?#]+))?/.exec(
+      trimmed,
+    );
   const shorthandMatch = /^([^/\s]+)\/([^/\s@#]+)(?:[@#]([^\s]+))?$/.exec(trimmed);
 
   if (sshMatch) {
@@ -94,7 +95,11 @@ async function githubFetch(url: string, token: string | undefined, signal?: Abor
     response = await fetch(url, { headers: headers(token), signal, cache: 'no-store' });
   } catch (error) {
     if (error instanceof Error && error.name === 'AbortError') throw error;
-    throw new IngestError('Could not reach GitHub. Check your network and try again.', 'network', 502);
+    throw new IngestError(
+      'Could not reach GitHub. Check your network and try again.',
+      'network',
+      502,
+    );
   }
 
   if (response.status === 404) {
@@ -133,7 +138,10 @@ export async function fetchRepoMetadata(
     description: json.description ?? undefined,
     defaultBranch: json.default_branch ?? 'main',
     stars: json.stargazers_count,
-    license: json.license?.spdx_id && json.license.spdx_id !== 'NOASSERTION' ? json.license.spdx_id : json.license?.name,
+    license:
+      json.license?.spdx_id && json.license.spdx_id !== 'NOASSERTION'
+        ? json.license.spdx_id
+        : json.license?.name,
     topics: json.topics,
     htmlUrl: json.html_url,
   };
@@ -226,7 +234,11 @@ export async function ingestGitHub(options: GitHubIngestOptions): Promise<Ingest
   );
 
   if (!files.length) {
-    throw new IngestError('The repository contained no analysable source files.', 'unsupported', 422);
+    throw new IngestError(
+      'The repository contained no analysable source files.',
+      'unsupported',
+      422,
+    );
   }
 
   const source: RepoSource = {

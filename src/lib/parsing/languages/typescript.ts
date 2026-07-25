@@ -93,7 +93,12 @@ function collectImports(scan: ScanResult): ImportRef[] {
   const seen = new Set<string>();
   const code = scan.code;
 
-  const push = (specifier: string | undefined, kind: ImportRef['kind'], symbols: string[], index: number) => {
+  const push = (
+    specifier: string | undefined,
+    kind: ImportRef['kind'],
+    symbols: string[],
+    index: number,
+  ) => {
     if (!specifier) return;
     const line = lineAt(scan, index);
     const key = `${specifier}|${kind}|${line}`;
@@ -152,7 +157,11 @@ function parseImportClause(clause: string): string[] {
   const named = /\{([\s\S]*)\}/.exec(trimmed);
   if (named) {
     for (const entry of named[1].split(',')) {
-      const name = entry.trim().replace(/^type\s+/, '').split(/\s+as\s+/)[0].trim();
+      const name = entry
+        .trim()
+        .replace(/^type\s+/, '')
+        .split(/\s+as\s+/)[0]
+        .trim();
       if (name) symbols.push(name);
     }
   }
@@ -230,8 +239,7 @@ function collectClassMembers(
     if (name && !METHOD_KEYWORD_BLOCKLIST.has(name) && depthAt(body, nameOffset) === 1) {
       const parenIndex = bodyStart + match.index + match[0].length - 1;
       const parenEnd = matchBrace(scan.code, parenIndex, '(', ')');
-      const params =
-        parenEnd > 0 ? splitParams(scan.code.slice(parenIndex + 1, parenEnd - 1)) : [];
+      const params = parenEnd > 0 ? splitParams(scan.code.slice(parenIndex + 1, parenEnd - 1)) : [];
       const memberBody = parenEnd > 0 ? readBraceBody(scan, parenEnd) : undefined;
       const line = lineAt(scan, absolute);
       const endLine = memberBody?.endLine ?? line;
@@ -543,7 +551,8 @@ function createParser(id: string, language: LanguageId, extensions: string[]): L
     language,
     extensions,
     parse(file: SourceFile): ParsedFile {
-      const profile = language === 'typescript' ? SYNTAX_PROFILES.typescript : SYNTAX_PROFILES.javascript;
+      const profile =
+        language === 'typescript' ? SYNTAX_PROFILES.typescript : SYNTAX_PROFILES.javascript;
       const scan = scanSource(file.content, profile);
       const symbols = collectSymbols(scan, file.path, 'typescript');
       const ranges: SymbolRange[] = symbols.map((s) => ({

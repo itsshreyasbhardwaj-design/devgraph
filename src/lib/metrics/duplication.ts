@@ -186,7 +186,9 @@ function rangesOverlap(a: WindowEntry, b: WindowEntry): boolean {
  */
 function mergeAdjacent(groups: WindowEntry[][]): WindowEntry[][] {
   const sorted = groups
-    .map((group) => [...group].sort((a, b) => a.path.localeCompare(b.path) || a.startLine - b.startLine))
+    .map((group) =>
+      [...group].sort((a, b) => a.path.localeCompare(b.path) || a.startLine - b.startLine),
+    )
     .sort((a, b) => signature(a).localeCompare(signature(b)));
 
   const merged: WindowEntry[][] = [];

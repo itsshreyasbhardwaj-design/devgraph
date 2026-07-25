@@ -33,11 +33,7 @@ export function toApiError(error: unknown): NextResponse<ApiErrorBody> {
   }
   if (error instanceof z.ZodError) {
     const first = error.issues[0];
-    return apiError(
-      `${first.path.join('.') || 'request'}: ${first.message}`,
-      'invalid-input',
-      400,
-    );
+    return apiError(`${first.path.join('.') || 'request'}: ${first.message}`, 'invalid-input', 400);
   }
   if (error instanceof Error && error.name === 'AbortError') {
     return apiError('The request was cancelled.', 'aborted', 499);
@@ -53,7 +49,10 @@ export interface GuardResult {
 }
 
 export class RateLimitedError extends Error {
-  constructor(readonly headers: Record<string, string>, readonly retryAfter: number) {
+  constructor(
+    readonly headers: Record<string, string>,
+    readonly retryAfter: number,
+  ) {
     super('Too many requests.');
     this.name = 'RateLimitedError';
   }
@@ -112,7 +111,11 @@ export function handleGuardError(error: unknown): NextResponse<ApiErrorBody> | u
 }
 
 /** Parse and validate a JSON body, with a hard size ceiling. */
-export async function readJson<T>(request: Request, schema: z.ZodType<T>, maxBytes = 64 * 1024): Promise<T> {
+export async function readJson<T>(
+  request: Request,
+  schema: z.ZodType<T>,
+  maxBytes = 64 * 1024,
+): Promise<T> {
   const declared = Number(request.headers.get('content-length') ?? '0');
   if (declared > maxBytes) {
     throw new IngestError('Request body is too large.', 'too-large', 413);

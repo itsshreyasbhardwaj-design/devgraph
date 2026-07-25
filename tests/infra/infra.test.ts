@@ -5,7 +5,12 @@ import { InMemoryRateLimiter, clientKey } from '@/lib/security/ratelimit';
 import { MemoryAnalysisStore } from '@/lib/storage/memory';
 import { sourceKey } from '@/lib/storage/types';
 import { analysisToMermaid, toMermaid } from '@/lib/export/mermaid';
-import { buildDependencyEvents, buildModuleGrowth, diffSnapshots, sampleCommits } from '@/lib/git/timeline';
+import {
+  buildDependencyEvents,
+  buildModuleGrowth,
+  diffSnapshots,
+  sampleCommits,
+} from '@/lib/git/timeline';
 import { buildAnalysisDigest } from '@/lib/insights/context';
 import { toInsightSection, unverifiedReferences } from '@/lib/insights/openrouter';
 import { sampleRepoFiles } from '../fixtures/sampleRepo';
@@ -132,9 +137,30 @@ describe('mermaid export', () => {
 
 describe('timeline helpers', () => {
   const snapshots = [
-    { sha: 'a', date: '2024-01-01T00:00:00Z', files: 10, lines: 100, modules: { 'src/core': 5, 'src/ui': 5 }, dependencies: ['react'] },
-    { sha: 'b', date: '2024-06-01T00:00:00Z', files: 20, lines: 300, modules: { 'src/core': 8, 'src/ui': 12 }, dependencies: ['react', 'zustand'] },
-    { sha: 'c', date: '2024-12-01T00:00:00Z', files: 26, lines: 500, modules: { 'src/core': 8, 'src/ui': 18 }, dependencies: ['zustand'] },
+    {
+      sha: 'a',
+      date: '2024-01-01T00:00:00Z',
+      files: 10,
+      lines: 100,
+      modules: { 'src/core': 5, 'src/ui': 5 },
+      dependencies: ['react'],
+    },
+    {
+      sha: 'b',
+      date: '2024-06-01T00:00:00Z',
+      files: 20,
+      lines: 300,
+      modules: { 'src/core': 8, 'src/ui': 12 },
+      dependencies: ['react', 'zustand'],
+    },
+    {
+      sha: 'c',
+      date: '2024-12-01T00:00:00Z',
+      files: 26,
+      lines: 500,
+      modules: { 'src/core': 8, 'src/ui': 18 },
+      dependencies: ['zustand'],
+    },
   ];
 
   it('samples commits evenly and orders them oldest first', () => {

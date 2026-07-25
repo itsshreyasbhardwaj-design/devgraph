@@ -99,7 +99,9 @@ const drizzleExtractor: Extractor = (files) => {
           nullable: !/notNull\(\)/.test(modifiers),
           primaryKey: /primaryKey\(\)/.test(modifiers),
           unique: /\.unique\(\)/.test(modifiers),
-          references: referenceMatch ? { table: referenceMatch[1], column: referenceMatch[2] } : undefined,
+          references: referenceMatch
+            ? { table: referenceMatch[1], column: referenceMatch[2] }
+            : undefined,
         });
       }
       tables.push({
@@ -135,7 +137,10 @@ const sqlExtractor: Extractor = (files) => {
         const line = raw.trim().replace(/,$/, '');
         if (!line) continue;
         if (/^(PRIMARY|FOREIGN|UNIQUE|CONSTRAINT|CHECK|INDEX|KEY)\b/i.test(line)) {
-          const fk = /FOREIGN\s+KEY\s*\(\s*["`]?(\w+)["`]?\s*\)\s*REFERENCES\s+["`\[]?([\w.]+)["`\]]?\s*(?:\(\s*["`]?(\w+)["`]?\s*\))?/i.exec(line);
+          const fk =
+            /FOREIGN\s+KEY\s*\(\s*["`]?(\w+)["`]?\s*\)\s*REFERENCES\s+["`\[]?([\w.]+)["`\]]?\s*(?:\(\s*["`]?(\w+)["`]?\s*\))?/i.exec(
+              line,
+            );
           if (fk) {
             const column = columns.find((c) => c.name === fk[1]);
             if (column) column.references = { table: fk[2], column: fk[3] };
@@ -144,7 +149,8 @@ const sqlExtractor: Extractor = (files) => {
         }
         const typeMatch = SQL_TYPE.exec(line);
         if (!typeMatch) continue;
-        const inlineRef = /REFERENCES\s+["`\[]?([\w.]+)["`\]]?\s*(?:\(\s*["`]?(\w+)["`]?\s*\))?/i.exec(line);
+        const inlineRef =
+          /REFERENCES\s+["`\[]?([\w.]+)["`\]]?\s*(?:\(\s*["`]?(\w+)["`]?\s*\))?/i.exec(line);
         columns.push({
           name: typeMatch[1].replace(/["`\[\]]/g, ''),
           type: typeMatch[2].trim(),
@@ -197,7 +203,8 @@ const djangoExtractor: Extractor = (files) => {
   const tables: DbTable[] = [];
 
   for (const file of files) {
-    if (!file.path.endsWith('.py') || !/models\.Model|models\.\w+Field/.test(file.content)) continue;
+    if (!file.path.endsWith('.py') || !/models\.Model|models\.\w+Field/.test(file.content))
+      continue;
 
     for (const match of file.content.matchAll(
       /^class\s+(\w+)\s*\(\s*[\w.]*Model[^)]*\)\s*:\s*\n([\s\S]*?)(?=^class\s|\Z)/gm,
@@ -206,9 +213,7 @@ const djangoExtractor: Extractor = (files) => {
       for (const field of match[2].matchAll(/^\s{4}(\w+)\s*=\s*models\.(\w+)\(([^\n]*)/gm)) {
         const args = field[3] ?? '';
         const relation = /^(ForeignKey|OneToOneField|ManyToManyField)$/.test(field[2]);
-        const target = relation
-          ? /\(\s*["']?(\w+)["']?/.exec(`(${args}`)?.[1]
-          : undefined;
+        const target = relation ? /\(\s*["']?(\w+)["']?/.exec(`(${args}`)?.[1] : undefined;
         columns.push({
           name: field[1],
           type: field[2],
@@ -292,7 +297,9 @@ const mongooseExtractor: Extractor = (files) => {
       /(?:const|let|var)\s+(\w+)\s*=\s*new\s+(?:mongoose\.)?Schema\s*(?:<[^>]*>)?\s*\(\s*\{([\s\S]*?)\n\s*\}/g,
     )) {
       const columns: DbColumn[] = [];
-      for (const field of match[2].matchAll(/(\w+)\s*:\s*\{?\s*(?:type\s*:\s*)?([\w.\[\]]+)([^,\n]*)/g)) {
+      for (const field of match[2].matchAll(
+        /(\w+)\s*:\s*\{?\s*(?:type\s*:\s*)?([\w.\[\]]+)([^,\n]*)/g,
+      )) {
         const modifiers = field[3] ?? '';
         const ref = /ref\s*:\s*['"](\w+)['"]/.exec(modifiers);
         columns.push({
@@ -361,7 +368,9 @@ const entityExtractor: Extractor = (files) => {
             name: field[3],
             type: field[2],
             primaryKey: field[1] === 'Id',
-            references: /Many|One/.test(field[1]) ? { table: field[2].replace(/.*<|>.*/g, '') } : undefined,
+            references: /Many|One/.test(field[1])
+              ? { table: field[2].replace(/.*<|>.*/g, '') }
+              : undefined,
           });
         }
       } else {
