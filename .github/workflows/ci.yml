@@ -14,7 +14,6 @@ concurrency:
 
 env:
   NODE_VERSION: '22'
-  PNPM_VERSION: '10'
 
 jobs:
   quality:
@@ -25,9 +24,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # No `version` here: package.json's `packageManager` field is the single
+      # source of truth, and specifying both makes the action refuse to run.
       - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - uses: actions/setup-node@v5
         with:
@@ -65,9 +64,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # No `version` here: package.json's `packageManager` field is the single
+      # source of truth, and specifying both makes the action refuse to run.
       - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - uses: actions/setup-node@v5
         with:
@@ -98,9 +97,9 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
+      # No `version` here: package.json's `packageManager` field is the single
+      # source of truth, and specifying both makes the action refuse to run.
       - uses: pnpm/action-setup@v4
-        with:
-          version: ${{ env.PNPM_VERSION }}
 
       - uses: actions/setup-node@v5
         with:
