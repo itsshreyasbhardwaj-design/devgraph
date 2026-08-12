@@ -3,3 +3,8 @@ allowBuilds:
   unrs-resolver: true
   esbuild: true
   core-js: false
+overrides:
+  postcss: ">=8.5.23"
+  sharp: ">=0.35.0"
+  dompurify: ">=3.4.13"
+  nanoid: ">=3.3.17"
