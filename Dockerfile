@@ -1,14 +1,14 @@
 # syntax=docker/dockerfile:1
 
 # ---- dependencies ----------------------------------------------------------
-FROM node:22-alpine AS deps
+FROM node:26-alpine AS deps
 RUN corepack enable
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc* ./
 RUN pnpm install --frozen-lockfile
 
 # ---- build -----------------------------------------------------------------
-FROM node:22-alpine AS builder
+FROM node:26-alpine AS builder
 RUN corepack enable
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -19,7 +19,7 @@ RUN pnpm build
 # ---- runtime ---------------------------------------------------------------
 # Uses Next.js standalone output: only the server and the modules it actually
 # imports are copied, which keeps the runtime image small.
-FROM node:22-alpine AS runner
+FROM node:26-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production \
